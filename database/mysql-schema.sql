@@ -1,13 +1,7 @@
 -- Fresh MySQL schema for Oversmoke Vlounge.
--- This contains structure only; it does not copy data from SQLite.
+-- Run against the target database; this contains structure only and no SQLite data.
 
 SET NAMES utf8mb4;
-
-CREATE DATABASE IF NOT EXISTS `oversmoke_vlounge`
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE `oversmoke_vlounge`;
 
 CREATE TABLE `users` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

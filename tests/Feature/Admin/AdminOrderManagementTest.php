@@ -83,6 +83,19 @@ class AdminOrderManagementTest extends TestCase
             ->assertSee('admin-notifications.js');
     }
 
+    public function test_notification_order_links_use_https_behind_a_trusted_proxy(): void
+    {
+        $admin = $this->createAdmin();
+        $order = $this->createOrder();
+        $admin->notify(new NewOrderReceived($order));
+
+        $this->actingAs($admin, 'admin')
+            ->withHeader('X-Forwarded-Proto', 'https')
+            ->getJson('/admin/orders/notifications')
+            ->assertOk()
+            ->assertJsonPath('notifications.0.url', fn (string $url): bool => str_starts_with($url, 'https://'));
+    }
+
     public function test_admin_can_email_invoice_to_customer(): void
     {
         config(['mail.default' => 'smtp']);

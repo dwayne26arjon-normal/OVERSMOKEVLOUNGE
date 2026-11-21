@@ -156,17 +156,25 @@ class AdminProductManagementTest extends TestCase
                 'stock' => 20,
                 'is_active' => '1',
                 'is_featured' => '1',
+                'is_hot' => '1',
+                'is_best_seller' => '1',
             ])
             ->assertRedirect(route('admin.products.index'));
 
         $product = Product::where('name', 'Admin Added Berry')->firstOrFail();
         $this->assertTrue($product->is_featured);
+        $this->assertTrue($product->is_hot);
+        $this->assertTrue($product->is_best_seller);
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.products.edit', $product))
             ->assertOk()
             ->assertSee('Featured product')
+            ->assertSee('Hot item')
+            ->assertSee('Best seller')
             ->assertSee('name="is_featured"', false)
+            ->assertSee('name="is_hot"', false)
+            ->assertSee('name="is_best_seller"', false)
             ->assertSee('checked', false);
 
         $this->actingAs($customer, 'web')
@@ -174,6 +182,9 @@ class AdminProductManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Admin Added Berry')
             ->assertSee('Vape Co')
+            ->assertSee('20 available')
+            ->assertSee('Best Seller')
+            ->assertSee('>Hot</span>', false)
             ->assertSee('class="featured-label">Featured', false);
     }
 

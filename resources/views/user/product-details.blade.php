@@ -37,6 +37,7 @@
         @php
             $availableVariant = $product->variants->first(fn ($variant) => $variant->stock > 0) ?? $product->variants->first();
             $previewImagePath = $availableVariant?->image_path ?: $product->image_path;
+            $initialOptionStock = $availableVariant?->stock ?? $product->stock;
         @endphp
         <section class="product-panel" id="product"
                  data-id="{{ $product->id }}"
@@ -91,6 +92,9 @@
                     <fieldset class="color-picker" hidden></fieldset>
                     <span id="selectedOption" hidden></span>
                 @endif
+                <p class="option-stock{{ $initialOptionStock === 0 ? ' is-out' : '' }}" id="optionStock" role="status" aria-live="polite">
+                    {{ $initialOptionStock > 0 ? number_format($initialOptionStock) . ' available' : 'Out of stock' }}
+                </p>
 
                 <div class="purchase-row">
                     <div class="quantity-control">

@@ -16,7 +16,8 @@
         let autoplayTimer = null;
         let pointerOver = false;
         let hasFocus = false;
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let manuallyPaused = false;
+        const autoplayToggle = carousel.querySelector('[data-featured-toggle]');
 
         const showSlide = (index, direction = index > activeIndex ? 'next' : 'previous') => {
             const previousIndex = activeIndex;
@@ -47,7 +48,7 @@
         };
         const startAutoplay = () => {
             stopAutoplay();
-            if (reducedMotion.matches || document.hidden || pointerOver || hasFocus) return;
+            if (manuallyPaused || document.hidden || pointerOver || hasFocus) return;
 
             autoplayTimer = window.setInterval(() => showSlide(activeIndex + 1, 'next'), 6000);
         };
@@ -58,6 +59,17 @@
 
         carousel.querySelector('[data-featured-previous]').addEventListener('click', () => showManualSlide(activeIndex - 1, 'previous'));
         carousel.querySelector('[data-featured-next]').addEventListener('click', () => showManualSlide(activeIndex + 1, 'next'));
+        autoplayToggle?.addEventListener('click', () => {
+            manuallyPaused = !manuallyPaused;
+            autoplayToggle.textContent = manuallyPaused ? 'Play' : 'Pause';
+            autoplayToggle.setAttribute('aria-label', `${manuallyPaused ? 'Play' : 'Pause'} automatic featured products`);
+            autoplayToggle.setAttribute('aria-pressed', String(manuallyPaused));
+            if (manuallyPaused) stopAutoplay();
+            else {
+                hasFocus = false;
+                startAutoplay();
+            }
+        });
         dots.forEach(dot => {
             dot.addEventListener('click', () => showManualSlide(Number(dot.dataset.featuredDot)));
         });
@@ -90,7 +102,6 @@
             startAutoplay();
         });
         document.addEventListener('visibilitychange', startAutoplay);
-        reducedMotion.addEventListener('change', startAutoplay);
         startAutoplay();
     });
 

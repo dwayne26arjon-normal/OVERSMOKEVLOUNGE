@@ -176,6 +176,14 @@
                     <input type="checkbox" id="is_featured" name="is_featured" value="1" @checked($errors->any() ? old('is_featured') : ($product->exists && $product->is_featured))>
                     <span><strong>Featured product</strong><small>Show this product first in the Featured storefront section.</small></span>
                 </label>
+                <label class="active-toggle" for="is_hot">
+                    <input type="checkbox" id="is_hot" name="is_hot" value="1" @checked($errors->any() ? old('is_hot') : ($product->exists && $product->is_hot))>
+                    <span><strong>Hot item</strong><small>Show a Hot label on this product in the store.</small></span>
+                </label>
+                <label class="active-toggle" for="is_best_seller">
+                    <input type="checkbox" id="is_best_seller" name="is_best_seller" value="1" @checked($errors->any() ? old('is_best_seller') : ($product->exists && $product->is_best_seller))>
+                    <span><strong>Best seller</strong><small>Show a Best Seller label on this product in the store.</small></span>
+                </label>
             </section>
 
             <section class="panel form-panel form-actions">

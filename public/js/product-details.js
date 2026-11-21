@@ -2,6 +2,7 @@
     const product = document.getElementById('product');
     const quantityOutput = document.getElementById('quantity');
     const subtotal = document.getElementById('subtotal');
+    const optionStock = document.getElementById('optionStock');
     const buyNowDialog = document.getElementById('buyNowDialog');
     const authDialog = document.getElementById('authDialog');
     const userId = document.body.dataset.userId;
@@ -143,6 +144,14 @@
         subtotal.textContent = formatPrice(unitPrice * quantity);
     }
 
+    function updateOptionStock() {
+        const stock = selectedOption
+            ? Number(selectedOption.dataset.stock)
+            : Number(product.dataset.stock);
+        optionStock.textContent = stock > 0 ? `${formatPrice(stock)} available` : 'Out of stock';
+        optionStock.classList.toggle('is-out', stock <= 0);
+    }
+
     function productImage() {
         const imageUrl = selectedOption?.dataset.image || product.dataset.image;
         if (!imageUrl) return null;
@@ -168,6 +177,7 @@
             document.getElementById('selectedOption').textContent = button.dataset.option;
             showProductImage(button.dataset.image || product.dataset.image);
             updateQuantity(quantity);
+            updateOptionStock();
         });
     });
 
@@ -266,4 +276,6 @@
         sessionStorage.setItem(checkoutSourceKey, 'buy-now');
         window.location.href = '/checkout';
     });
+
+    updateOptionStock();
 })();

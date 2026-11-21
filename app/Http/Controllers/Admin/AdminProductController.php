@@ -282,6 +282,8 @@ class AdminProductController extends Controller
         unset($data['image'], $data['featured_image'], $data['variants']);
         $data['is_active'] = $request->boolean('is_active');
         $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_hot'] = $request->boolean('is_hot');
+        $data['is_best_seller'] = $request->boolean('is_best_seller');
         $variantLabel = $this->optionLabel($data['category']);
         $variants = $variantLabel ? $variants : [];
 
@@ -340,6 +342,8 @@ class AdminProductController extends Controller
         unset($data['image'], $data['featured_image'], $data['variants']);
         $data['is_active'] = $request->boolean('is_active');
         $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_hot'] = $request->boolean('is_hot');
+        $data['is_best_seller'] = $request->boolean('is_best_seller');
         $variantLabel = $this->optionLabel($data['category']);
         $variants = $variantLabel ? $variants : [];
         $variantNames = array_column($variants, 'name');
@@ -449,6 +453,8 @@ class AdminProductController extends Controller
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'stock' => ['required', 'integer', 'min:0', 'max:4294967295'],
             'is_featured' => ['sometimes', 'boolean'],
+            'is_hot' => ['sometimes', 'boolean'],
+            'is_best_seller' => ['sometimes', 'boolean'],
             'image' => ['nullable', 'image', 'max:2048'],
             'featured_image' => ['nullable', 'image', 'max:5120'],
             'variants' => ['nullable', 'array', 'min:1', 'max:30'],

@@ -18,6 +18,8 @@ class Product extends Model
         'featured_image_path',
         'is_active',
         'is_featured',
+        'is_hot',
+        'is_best_seller',
     ];
 
     protected function casts(): array
@@ -27,6 +29,8 @@ class Product extends Model
             'stock' => 'integer',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'is_hot' => 'boolean',
+            'is_best_seller' => 'boolean',
         ];
     }
 

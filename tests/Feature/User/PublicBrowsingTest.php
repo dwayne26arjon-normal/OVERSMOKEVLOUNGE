@@ -72,6 +72,7 @@ class PublicBrowsingTest extends TestCase
             ->assertSee('class="banner-featured" aria-label="Featured products"', false)
             ->assertSee('data-featured-next', false)
             ->assertSee('data-featured-dot="1"', false)
+            ->assertSee('data-featured-toggle', false)
             ->assertSee(route('products.show', Product::where('name', 'Featured Product')->first()), false)
             ->assertSee(route('products.show', Product::where('name', 'Regular Product')->first()), false)
             ->assertSee('featured-label">Featured', false);
@@ -97,7 +98,8 @@ class PublicBrowsingTest extends TestCase
             ->assertOk()
             ->assertSee('id="optionSearch"', false)
             ->assertSee('Search colors')
-            ->assertSee('Color 9');
+            ->assertSee('Color 9')
+            ->assertSee('1 available');
     }
 
     public function test_purchase_routes_require_login_and_return_to_requested_page(): void

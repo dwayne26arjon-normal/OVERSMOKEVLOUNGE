@@ -126,6 +126,7 @@
                                 <button class="featured-carousel-arrow" type="button" data-featured-next aria-label="Next featured product">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                                 </button>
+                                <button class="featured-carousel-toggle" type="button" data-featured-toggle aria-label="Pause automatic featured products" aria-pressed="false">Pause</button>
                             </div>
                         @endif
                     </div>
@@ -172,11 +173,24 @@
                             @endif
                         </div>
                         <div class="info">
-                            @if ($product->is_featured)
-                                <span class="featured-label">Featured</span>
+                            @if ($product->is_featured || $product->is_hot || $product->is_best_seller)
+                                <div class="product-labels">
+                                    @if ($product->is_best_seller)
+                                        <span class="product-label product-label--best-seller">Best Seller</span>
+                                    @endif
+                                    @if ($product->is_hot)
+                                        <span class="product-label product-label--hot">Hot</span>
+                                    @endif
+                                    @if ($product->is_featured)
+                                        <span class="featured-label">Featured</span>
+                                    @endif
+                                </div>
                             @endif
                             <h3><a href="{{ route('products.show', $product->id) }}">{{ $product->name }}</a></h3>
                             <div class="brand">{{ $product->brand }}</div>
+                            <p class="card-stock{{ $product->stock === 0 ? ' is-out' : '' }}">
+                                {{ $product->stock > 0 ? number_format($product->stock) . ' available' : 'Out of stock' }}
+                            </p>
                             <div class="price">₱ {{ number_format((float) $product->price) }}</div>
                             <a class="add" href="{{ route('products.show', $product->id) }}">🛒 View details</a>
                         </div>

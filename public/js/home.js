@@ -13,6 +13,11 @@
         if (slides.length < 2) return;
 
         let activeIndex = 0;
+        let autoplayTimer = null;
+        let pointerOver = false;
+        let hasFocus = false;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
         const showSlide = (index, direction = index > activeIndex ? 'next' : 'previous') => {
             const previousIndex = activeIndex;
             activeIndex = (index + slides.length) % slides.length;
@@ -36,20 +41,57 @@
             });
         };
 
-        carousel.querySelector('[data-featured-previous]').addEventListener('click', () => showSlide(activeIndex - 1, 'previous'));
-        carousel.querySelector('[data-featured-next]').addEventListener('click', () => showSlide(activeIndex + 1, 'next'));
+        const stopAutoplay = () => {
+            window.clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        };
+        const startAutoplay = () => {
+            stopAutoplay();
+            if (reducedMotion.matches || document.hidden || pointerOver || hasFocus) return;
+
+            autoplayTimer = window.setInterval(() => showSlide(activeIndex + 1, 'next'), 6000);
+        };
+        const showManualSlide = (index, direction) => {
+            showSlide(index, direction);
+            startAutoplay();
+        };
+
+        carousel.querySelector('[data-featured-previous]').addEventListener('click', () => showManualSlide(activeIndex - 1, 'previous'));
+        carousel.querySelector('[data-featured-next]').addEventListener('click', () => showManualSlide(activeIndex + 1, 'next'));
         dots.forEach(dot => {
-            dot.addEventListener('click', () => showSlide(Number(dot.dataset.featuredDot)));
+            dot.addEventListener('click', () => showManualSlide(Number(dot.dataset.featuredDot)));
         });
         carousel.addEventListener('keydown', event => {
             if (event.key === 'ArrowLeft') {
                 event.preventDefault();
-                showSlide(activeIndex - 1, 'previous');
+                showManualSlide(activeIndex - 1, 'previous');
             } else if (event.key === 'ArrowRight') {
                 event.preventDefault();
-                showSlide(activeIndex + 1, 'next');
+                showManualSlide(activeIndex + 1, 'next');
             }
         });
+        carousel.addEventListener('pointerenter', event => {
+            if (event.pointerType !== 'mouse') return;
+            pointerOver = true;
+            stopAutoplay();
+        });
+        carousel.addEventListener('pointerleave', event => {
+            if (event.pointerType !== 'mouse') return;
+            pointerOver = false;
+            startAutoplay();
+        });
+        carousel.addEventListener('focusin', () => {
+            hasFocus = true;
+            stopAutoplay();
+        });
+        carousel.addEventListener('focusout', event => {
+            if (carousel.contains(event.relatedTarget)) return;
+            hasFocus = false;
+            startAutoplay();
+        });
+        document.addEventListener('visibilitychange', startAutoplay);
+        reducedMotion.addEventListener('change', startAutoplay);
+        startAutoplay();
     });
 
     function syncFilterDrawer() {

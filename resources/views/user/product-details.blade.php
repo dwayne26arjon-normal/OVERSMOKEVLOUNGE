@@ -79,7 +79,7 @@
                         @endif
                         <div class="color-options">
                             @foreach ($product->variants as $variant)
-                                <button type="button" class="color-option{{ $availableVariant?->id === $variant->id ? ' selected' : '' }}" data-option="{{ $variant->name }}" data-stock="{{ $variant->stock }}" data-image="{{ $variant->image_path ? asset('storage/' . $variant->image_path) : '' }}" aria-pressed="{{ $availableVariant?->id === $variant->id ? 'true' : 'false' }}" @disabled($variant->stock <= 0)>
+                                <button type="button" class="color-option{{ $variant->stock <= 0 ? ' is-out-of-stock' : '' }}{{ $availableVariant?->id === $variant->id ? ' selected' : '' }}" data-option="{{ $variant->name }}" data-stock="{{ $variant->stock }}" data-image="{{ $variant->image_path ? asset('storage/' . $variant->image_path) : '' }}" aria-pressed="{{ $availableVariant?->id === $variant->id ? 'true' : 'false' }}">
                                     @if ($variant->image_path)
                                         <img class="color-option-image" src="{{ asset('storage/' . $variant->image_path) }}" alt="">
                                     @endif
@@ -109,8 +109,8 @@
                 </div>
 
                 <div class="actions">
-                    <button type="button" class="add-to-cart" id="addToCart">Add to Cart</button>
-                    <button type="button" class="buy-now" id="buyNow">Buy Now</button>
+                    <button type="button" class="add-to-cart" id="addToCart" @disabled($initialOptionStock <= 0)>Add to Cart</button>
+                    <button type="button" class="buy-now" id="buyNow" @disabled($initialOptionStock <= 0)>Buy Now</button>
                 </div>
                 <p class="status-message" id="statusMessage" role="status" aria-live="polite"></p>
             </div>

@@ -65,8 +65,10 @@ h1 { margin: 0; font-size: clamp(27px, 4vw, 40px); line-height: 1.2; }
 .option-stock { margin: 10px 0 0; color: #77dfb0; font-size: 11px; font-weight: 500; }
 .option-stock.is-out { color: #ff7888; }
 .color-option { display: inline-flex; min-width: 58px; align-items: center; justify-content: center; gap: 7px; padding: 5px 10px; border: 1px solid #535363; border-radius: 999px; background: transparent; font-size: 11px; transition: .2s; }
+.color-option.is-out-of-stock { color: #a4a4b7; border-color: #41414f; }
 .color-option-image { width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; object-fit: cover; }
 .color-option:hover, .color-option.selected { border-color: #a18bff; background: rgba(124, 92, 240, .2); }
+.color-option.is-out-of-stock:hover, .color-option.is-out-of-stock.selected { color: var(--text); }
 .color-option.selected { box-shadow: 0 0 0 1px var(--primary); }
 .purchase-row { display: flex; align-items: end; gap: 30px; margin: 24px 0; }
 .quantity-control > span, .subtotal { color: var(--muted); font-size: 11px; }
@@ -82,6 +84,7 @@ h1 { margin: 0; font-size: clamp(27px, 4vw, 40px); line-height: 1.2; }
 .add-to-cart:hover { background: rgba(124, 92, 240, .2); }
 .buy-now { background: var(--primary); }
 .buy-now:hover { background: #6542e5; transform: translateY(-1px); }
+.actions button:disabled, .actions button:disabled:hover { cursor: not-allowed; border-color: #454552; color: #92919e; background: #34343f; opacity: .8; transform: none; }
 .status-message { min-height: 20px; margin: 12px 0 0; color: #bbaeff; font-size: 12px; }
 .confirm-dialog { width: min(440px, calc(100% - 32px)); padding: 30px; border: 1px solid rgba(124,92,240,.55); border-radius: 16px; color: var(--text); background: #11111b; text-align: center; box-shadow: 0 24px 90px rgba(0,0,0,.55), 0 0 38px rgba(124,92,240,.15); }
 .confirm-dialog::backdrop { background: rgba(5,5,12,.78); backdrop-filter: blur(7px); }

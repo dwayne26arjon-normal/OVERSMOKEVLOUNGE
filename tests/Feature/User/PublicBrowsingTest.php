@@ -89,7 +89,7 @@ class PublicBrowsingTest extends TestCase
         ]);
         foreach (range(1, 9) as $index) {
             $product->variants()->create([
-                'name' => 'Color ' . $index,
+                'name' => 'Color '.$index,
                 'stock' => 1,
             ]);
         }
@@ -100,6 +100,29 @@ class PublicBrowsingTest extends TestCase
             ->assertSee('Search colors')
             ->assertSee('Color 9')
             ->assertSee('1 available');
+    }
+
+    public function test_out_of_stock_options_remain_selectable_for_preview_but_cannot_be_purchased(): void
+    {
+        $product = Product::create([
+            'name' => 'Sold Out Pod',
+            'category' => 'Pod System',
+            'price' => 1200,
+            'stock' => 0,
+            'is_active' => true,
+        ]);
+        $product->variants()->create([
+            'name' => 'Blue',
+            'stock' => 0,
+            'image_path' => 'products/variants/blue.png',
+        ]);
+
+        $this->get(route('products.show', $product))
+            ->assertOk()
+            ->assertSee('class="color-option is-out-of-stock selected"', false)
+            ->assertSee('data-option="Blue" data-stock="0"', false)
+            ->assertSee('id="addToCart" disabled', false)
+            ->assertSee('id="buyNow" disabled', false);
     }
 
     public function test_purchase_routes_require_login_and_return_to_requested_page(): void

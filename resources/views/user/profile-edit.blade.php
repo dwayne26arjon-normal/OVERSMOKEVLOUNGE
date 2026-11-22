@@ -62,10 +62,38 @@
                 @error('phone')<p class="error">{{ $message }}</p>@enderror
             </div>
 
+            @if (! auth()->user()->street && auth()->user()->address)
+                <p class="field-hint">Your currently saved address: {{ auth()->user()->address }}. Enter it in the fields below to save each part separately.</p>
+            @endif
+
             <div class="field">
-                <label for="address">Delivery address</label>
-                <textarea id="address" name="address" autocomplete="street-address" rows="3" maxlength="500" placeholder="House / unit, street, barangay, city, province, postal code">{{ old('address', auth()->user()->address) }}</textarea>
-                @error('address')<p class="error">{{ $message }}</p>@enderror
+                <label for="street">Street address</label>
+                <input id="street" name="street" type="text" value="{{ old('street', auth()->user()->street) }}" autocomplete="address-line1" required maxlength="200" placeholder="House / unit number and street">
+                @error('street')<p class="error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="field">
+                <label for="barangay">Barangay</label>
+                <input id="barangay" name="barangay" type="text" value="{{ old('barangay', auth()->user()->barangay) }}" autocomplete="address-line2" required maxlength="80">
+                @error('barangay')<p class="error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="field">
+                <label for="city">City / municipality</label>
+                <input id="city" name="city" type="text" value="{{ old('city', auth()->user()->city) }}" autocomplete="address-level2" required maxlength="80">
+                @error('city')<p class="error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="field">
+                <label for="province">Province</label>
+                <input id="province" name="province" type="text" value="{{ old('province', auth()->user()->province) }}" autocomplete="address-level1" required maxlength="80">
+                @error('province')<p class="error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="field">
+                <label for="postal_code">Postal code</label>
+                <input id="postal_code" name="postal_code" type="text" value="{{ old('postal_code', auth()->user()->postal_code) }}" autocomplete="postal-code" required maxlength="20" inputmode="numeric">
+                @error('postal_code')<p class="error">{{ $message }}</p>@enderror
             </div>
 
             <hr>

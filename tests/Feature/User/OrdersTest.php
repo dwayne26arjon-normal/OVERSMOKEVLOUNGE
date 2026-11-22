@@ -41,7 +41,11 @@ class OrdersTest extends TestCase
                 'customer' => [
                     'name' => 'Delivery Customer',
                     'phone' => '09123456789',
-                    'address' => '123 Example Street, Quezon City',
+                    'street' => '123 Example Street',
+                    'barangay' => 'San Isidro',
+                    'city' => 'Makati',
+                    'province' => 'Metro Manila',
+                    'postal_code' => '1234',
                 ],
                 'payment_method' => 'Cash on delivery',
             ])
@@ -54,6 +58,7 @@ class OrdersTest extends TestCase
         $this->assertSame('customer@example.com', $order->customer_email);
         $this->assertSame('Cloud Berry', $order->items->first()->product_name);
         $this->assertSame('450.00', $order->items->first()->unit_price);
+        $this->assertSame('123 Example Street, San Isidro, Makati, Metro Manila, 1234', $order->delivery_address);
         $this->assertCount(2, $order->items);
         $this->assertSame(8, $product->fresh()->stock);
         $this->assertSame('0.00', $order->shipping_fee);

@@ -3,6 +3,8 @@
     const quantityOutput = document.getElementById('quantity');
     const subtotal = document.getElementById('subtotal');
     const optionStock = document.getElementById('optionStock');
+    const addToCartButton = document.getElementById('addToCart');
+    const buyNowButton = document.getElementById('buyNow');
     const buyNowDialog = document.getElementById('buyNowDialog');
     const authDialog = document.getElementById('authDialog');
     const userId = document.body.dataset.userId;
@@ -150,6 +152,8 @@
             : Number(product.dataset.stock);
         optionStock.textContent = stock > 0 ? `${formatPrice(stock)} available` : 'Out of stock';
         optionStock.classList.toggle('is-out', stock <= 0);
+        addToCartButton.disabled = stock <= 0;
+        buyNowButton.disabled = stock <= 0;
     }
 
     function productImage() {

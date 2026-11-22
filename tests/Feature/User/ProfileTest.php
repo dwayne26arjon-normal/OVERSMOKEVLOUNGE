@@ -225,7 +225,11 @@ class ProfileTest extends TestCase
         $response = $this->actingAs($user)->putJson(route('profile.delivery.update'), [
             'name' => 'Delivery Name',
             'phone' => '09123456789',
-            'address' => '123 Example Street, Quezon City',
+            'street' => '123 Example Street',
+            'barangay' => 'San Isidro',
+            'city' => 'Makati',
+            'province' => 'Metro Manila',
+            'postal_code' => '1234',
         ]);
 
         $response->assertOk()
@@ -234,8 +238,35 @@ class ProfileTest extends TestCase
             'id' => $user->id,
             'name' => 'Delivery Name',
             'phone' => '09123456789',
-            'address' => '123 Example Street, Quezon City',
+            'address' => '123 Example Street, San Isidro, Makati, Metro Manila, 1234',
+            'street' => '123 Example Street',
+            'barangay' => 'San Isidro',
+            'city' => 'Makati',
+            'province' => 'Metro Manila',
+            'postal_code' => '1234',
         ]);
+    }
+
+    public function test_checkout_and_profile_show_separate_saved_address_fields(): void
+    {
+        $user = User::factory()->create([
+            'street' => '123 Example Street',
+            'barangay' => 'San Isidro',
+            'city' => 'Makati',
+            'province' => 'Metro Manila',
+            'postal_code' => '1234',
+        ]);
+
+        foreach ([route('checkout'), route('profile.edit')] as $path) {
+            $this->actingAs($user)
+                ->get($path)
+                ->assertOk()
+                ->assertSee('name="street"', false)
+                ->assertSee('name="barangay"', false)
+                ->assertSee('name="city"', false)
+                ->assertSee('name="province"', false)
+                ->assertSee('name="postal_code"', false);
+        }
     }
 
     public function test_password_change_requires_the_current_password(): void

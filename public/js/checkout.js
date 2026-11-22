@@ -17,9 +17,14 @@
     let details = {
         name: document.getElementById('customerName').value,
         phone: document.getElementById('phone').value,
-        address: document.getElementById('address').value,
+        street: document.getElementById('street').value,
+        barangay: document.getElementById('barangay').value,
+        city: document.getElementById('city').value,
+        province: document.getElementById('province').value,
+        postal_code: document.getElementById('postalCode').value,
         paymentMethod: 'Cash on delivery'
     };
+    const legacyAddress = addressPreview.dataset.legacyAddress || '';
     const savedCheckoutDetails = JSON.parse(localStorage.getItem(deliveryDetailsKey) || '{}');
     details.paymentMethod = savedCheckoutDetails.paymentMethod || details.paymentMethod;
 
@@ -64,9 +69,22 @@
     }
 
     function updateAddressPreview() {
-        addressPreview.textContent = details.phone && details.address
-            ? `${details.phone} · ${details.address}`
+        const address = formattedAddress(details) || legacyAddress;
+        addressPreview.textContent = details.phone && address
+            ? `${details.phone} · ${address}`
             : 'Add your phone number and delivery address.';
+    }
+
+    function formattedAddress(source) {
+        return [source.street, source.barangay, source.city, source.province, source.postal_code]
+            .map(value => value.trim())
+            .filter(Boolean)
+            .join(', ');
+    }
+
+    function hasCompleteAddress(source) {
+        return [source.street, source.barangay, source.city, source.province, source.postal_code]
+            .every(value => value.trim() !== '');
     }
 
     function showSavedDetails() {
@@ -77,7 +95,11 @@
         details = {
             name: document.getElementById('customerName').value.trim(),
             phone: document.getElementById('phone').value.trim(),
-            address: document.getElementById('address').value.trim(),
+            street: document.getElementById('street').value.trim(),
+            barangay: document.getElementById('barangay').value.trim(),
+            city: document.getElementById('city').value.trim(),
+            province: document.getElementById('province').value.trim(),
+            postal_code: document.getElementById('postalCode').value.trim(),
             paymentMethod: document.getElementById('paymentMethod').value
         };
     }
@@ -109,7 +131,11 @@
                 body: JSON.stringify({
                     name: details.name,
                     phone: details.phone,
-                    address: details.address
+                    street: details.street,
+                    barangay: details.barangay,
+                    city: details.city,
+                    province: details.province,
+                    postal_code: details.postal_code
                 })
             });
             const result = await response.json();
@@ -133,10 +159,10 @@
             form.requestSubmit();
             return;
         }
-        if (!details.phone || !details.address) {
+        if (!details.phone || !hasCompleteAddress(details)) {
             form.hidden = false;
             form.reportValidity();
-            message.textContent = 'Please add your phone number and delivery address before confirming.';
+            message.textContent = 'Please add your phone number and complete delivery address before confirming.';
             return;
         }
 
@@ -163,7 +189,11 @@
                     customer: {
                         name: details.name,
                         phone: details.phone,
-                        address: details.address
+                        street: details.street,
+                        barangay: details.barangay,
+                        city: details.city,
+                        province: details.province,
+                        postal_code: details.postal_code
                     },
                     payment_method: details.paymentMethod
                 })

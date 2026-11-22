@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewOrderReceived;
 use App\Notifications\OrderPlaced;
 use App\Notifications\OrderStatusUpdated;
+use App\Support\DeliveryAddress;
 use App\Support\OrderInventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -77,7 +78,12 @@ class OrderController extends Controller
             'items.*.color' => ['nullable', 'string', 'max:50'],
             'customer.name' => ['required', 'string', 'max:120'],
             'customer.phone' => ['required', 'string', 'max:30'],
-            'customer.address' => ['required', 'string', 'max:500'],
+            'customer.address' => ['nullable', 'string', 'max:500'],
+            'customer.street' => ['required_without:customer.address', 'nullable', 'string', 'max:200'],
+            'customer.barangay' => ['required_without:customer.address', 'nullable', 'string', 'max:80'],
+            'customer.city' => ['required_without:customer.address', 'nullable', 'string', 'max:80'],
+            'customer.province' => ['required_without:customer.address', 'nullable', 'string', 'max:80'],
+            'customer.postal_code' => ['required_without:customer.address', 'nullable', 'string', 'max:20'],
             'payment_method' => ['required', 'in:Cash on delivery'],
         ]);
 
@@ -154,7 +160,9 @@ class OrderController extends Controller
                 'customer_name' => $data['customer']['name'],
                 'customer_email' => $request->user()->email,
                 'customer_phone' => $data['customer']['phone'],
-                'delivery_address' => $data['customer']['address'],
+                'delivery_address' => DeliveryAddress::hasComponents($data['customer'])
+                    ? DeliveryAddress::format($data['customer'])
+                    : $data['customer']['address'],
                 'payment_method' => $data['payment_method'],
                 'status' => 'processing',
                 'subtotal' => $subtotal,

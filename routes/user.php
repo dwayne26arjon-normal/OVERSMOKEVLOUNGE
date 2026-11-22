@@ -5,6 +5,7 @@ use App\Http\Controllers\User\NotificationController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Models\Product;
+use App\Support\DeliveryAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -100,7 +101,7 @@ Route::view('/privacy-policy', 'user.legal', [
 Route::get('/go/{page}', function ($page) {
     abort_unless(in_array($page, ['login', 'register']), 404);
 
-    return view('user.splash', ['next' => url('/' . $page), 'quick' => true]);
+    return view('user.splash', ['next' => url('/'.$page), 'quick' => true]);
 })->middleware('guest');
 
 Route::middleware('guest')->group(function () {
@@ -138,6 +139,7 @@ Route::get('/home', function () {
 
 Route::get('/products/{id}', function (int $id) {
     $product = Product::query()->with('variants')->where('is_active', true)->findOrFail($id);
+
     return view('user.product-details', compact('product'));
 })->whereNumber('id')->name('products.show');
 
@@ -160,9 +162,14 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
         $user = $request->user('web');
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:500'],
+            'street' => ['required_without:address', 'nullable', 'string', 'max:200'],
+            'barangay' => ['required_without:address', 'nullable', 'string', 'max:80'],
+            'city' => ['required_without:address', 'nullable', 'string', 'max:80'],
+            'province' => ['required_without:address', 'nullable', 'string', 'max:80'],
+            'postal_code' => ['required_without:address', 'nullable', 'string', 'max:20'],
             'current_password' => ['required_with:password', 'current_password'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
@@ -170,7 +177,21 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->phone = $data['phone'] ?? null;
-        $user->address = $data['address'] ?? null;
+        if (DeliveryAddress::hasComponents($data)) {
+            $user->address = DeliveryAddress::format($data);
+            $user->street = $data['street'];
+            $user->barangay = $data['barangay'];
+            $user->city = $data['city'];
+            $user->province = $data['province'];
+            $user->postal_code = $data['postal_code'];
+        } elseif (array_key_exists('address', $data)) {
+            $user->address = $data['address'];
+            $user->street = null;
+            $user->barangay = null;
+            $user->city = null;
+            $user->province = null;
+            $user->postal_code = null;
+        }
         if (! empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
@@ -183,10 +204,36 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'phone' => ['required', 'string', 'max:30'],
-            'address' => ['required', 'string', 'max:500'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'street' => ['required_without:address', 'nullable', 'string', 'max:200'],
+            'barangay' => ['required_without:address', 'nullable', 'string', 'max:80'],
+            'city' => ['required_without:address', 'nullable', 'string', 'max:80'],
+            'province' => ['required_without:address', 'nullable', 'string', 'max:80'],
+            'postal_code' => ['required_without:address', 'nullable', 'string', 'max:20'],
         ]);
 
-        $request->user('web')->update($data);
+        $user = $request->user('web');
+        if (DeliveryAddress::hasComponents($data)) {
+            $user->update([
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'address' => DeliveryAddress::format($data),
+                'street' => $data['street'],
+                'barangay' => $data['barangay'],
+                'city' => $data['city'],
+                'province' => $data['province'],
+                'postal_code' => $data['postal_code'],
+            ]);
+        } else {
+            $user->update($data);
+            $user->update([
+                'street' => null,
+                'barangay' => null,
+                'city' => null,
+                'province' => null,
+                'postal_code' => null,
+            ]);
+        }
 
         return response()->json(['message' => 'Delivery details saved to your profile.']);
     })->name('profile.delivery.update');

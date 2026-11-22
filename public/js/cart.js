@@ -115,8 +115,8 @@
             remove.type = 'button';
             remove.className = 'remove-item';
             remove.dataset.action = 'remove';
-            remove.setAttribute('aria-label', `Remove ${item.name} from cart`);
-            remove.textContent = 'Remove';
+            remove.setAttribute('aria-label', `Remove all ${item.quantity} ${item.name} from cart`);
+            remove.textContent = 'Remove all';
 
             row.append(product, unitPrice, quantity, lineTotal, remove);
             itemsContainer.append(row);

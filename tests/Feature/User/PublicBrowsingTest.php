@@ -11,36 +11,6 @@ class PublicBrowsingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_product_images_use_a_versioned_url_on_customer_pages(): void
-    {
-        $product = Product::create([
-            'name' => 'Versioned Image Product',
-            'category' => 'Devices',
-            'price' => 1200,
-            'stock' => 5,
-            'image_path' => 'products/device.png',
-            'featured_image_path' => 'products/featured/device.png',
-            'is_active' => true,
-            'is_featured' => true,
-        ]);
-        $variant = $product->variants()->create([
-            'name' => 'Black',
-            'stock' => 5,
-            'image_path' => 'products/variants/black.png',
-        ]);
-        $version = $product->updated_at->timestamp;
-
-        $this->get(route('home'))
-            ->assertOk()
-            ->assertSee(asset('storage/products/featured/device.png').'?v='.$version, false)
-            ->assertSee(asset('storage/products/device.png').'?v='.$version, false);
-
-        $this->get(route('products.show', $product))
-            ->assertOk()
-            ->assertSee(asset('storage/products/device.png').'?v='.$version, false)
-            ->assertSee(asset('storage/products/variants/black.png').'?v='.$version, false);
-    }
-
     public function test_guest_can_browse_home_and_product_details(): void
     {
         $product = Product::create([

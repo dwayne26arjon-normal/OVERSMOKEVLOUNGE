@@ -442,6 +442,20 @@
         top: 112px;
         right: 12px;
     }
+
+    .user-notification-menu {
+        width: min(280px, calc(100vw - 24px));
+        max-height: min(42vh, 320px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-notification-list {
+        min-height: 0;
+        max-height: none;
+        flex: 1 1 auto;
+        overflow-y: auto;
+    }
 }
 
 @media (max-width: 600px) {

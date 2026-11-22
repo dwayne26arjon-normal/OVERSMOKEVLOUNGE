@@ -137,6 +137,10 @@
             <button type="button" class="confirm-cancel" id="closeAuthDialog">Not now</button>
         </div>
     </dialog>
+    <div class="cart-success-toast" id="cartSuccessToast" role="status" aria-live="polite" aria-atomic="true" hidden>
+        <span class="cart-success-icon" aria-hidden="true">✓</span>
+        <span>Successfully added to cart.</span>
+    </div>
     <script src="{{ asset('js/product-details.js') }}?v={{ filemtime(public_path('js/product-details.js')) }}"></script>
     <script src="{{ asset('js/account-menu.js') }}?v={{ filemtime(public_path('js/account-menu.js')) }}"></script>
 </body>

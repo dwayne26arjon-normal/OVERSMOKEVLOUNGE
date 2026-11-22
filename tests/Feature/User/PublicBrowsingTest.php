@@ -125,6 +125,23 @@ class PublicBrowsingTest extends TestCase
             ->assertSee('id="buyNow" disabled', false);
     }
 
+    public function test_product_details_provides_an_accessible_cart_success_popup(): void
+    {
+        $product = Product::create([
+            'name' => 'Cart Toast Product',
+            'category' => 'Devices',
+            'price' => 1200,
+            'stock' => 5,
+            'is_active' => true,
+        ]);
+
+        $this->get(route('products.show', $product))
+            ->assertOk()
+            ->assertSee('id="cartSuccessToast"', false)
+            ->assertSee('role="status" aria-live="polite"', false)
+            ->assertSee('Successfully added to cart.');
+    }
+
     public function test_purchase_routes_require_login_and_return_to_requested_page(): void
     {
         $this->get(route('checkout'))

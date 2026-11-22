@@ -5,6 +5,7 @@
     const optionStock = document.getElementById('optionStock');
     const addToCartButton = document.getElementById('addToCart');
     const buyNowButton = document.getElementById('buyNow');
+    const cartSuccessToast = document.getElementById('cartSuccessToast');
     const buyNowDialog = document.getElementById('buyNowDialog');
     const authDialog = document.getElementById('authDialog');
     const userId = document.body.dataset.userId;
@@ -15,6 +16,7 @@
     const options = JSON.parse(product.dataset.options || '[]');
     let quantity = Number(quantityOutput.textContent);
     let selectedOption = document.querySelector('.color-option.selected');
+    let cartSuccessTimer;
 
     function formatPrice(price) {
         return new Intl.NumberFormat('en-PH').format(price);
@@ -23,6 +25,14 @@
     function syncCartCount() {
         const cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
         document.getElementById('cartCount').textContent = cart.length;
+    }
+
+    function showCartSuccessToast() {
+        cartSuccessToast.hidden = false;
+        window.clearTimeout(cartSuccessTimer);
+        cartSuccessTimer = window.setTimeout(() => {
+            cartSuccessToast.hidden = true;
+        }, 3500);
     }
 
     function animateCartFly(imageUrl) {
@@ -237,7 +247,8 @@
         localStorage.setItem(cartKey, JSON.stringify(cart));
         syncCartCount();
         animateCartFly(image);
-        document.getElementById('statusMessage').textContent = 'Added to cart.';
+        document.getElementById('statusMessage').textContent = '';
+        showCartSuccessToast();
     }
 
     document.getElementById('addToCart').addEventListener('click', addToCart);

@@ -98,6 +98,10 @@ h1 { margin: 0; font-size: clamp(27px, 4vw, 40px); line-height: 1.2; }
 .confirm-cancel:hover { background: rgba(124,92,240,.14); }
 .confirm-proceed { background: var(--primary); }
 .confirm-proceed:hover { background: #6542e5; }
+.cart-success-toast { position: fixed; right: 24px; bottom: 24px; z-index: 1200; display: flex; width: min(340px, calc(100vw - 32px)); align-items: center; gap: 11px; padding: 14px 16px; border: 1px solid rgba(104, 214, 159, .48); border-radius: 12px; color: #effff7; background: #141d1b; box-shadow: 0 14px 36px rgba(0,0,0,.48); font-size: 12px; font-weight: 500; animation: cart-success-in .24s ease-out both; }
+.cart-success-toast[hidden] { display: none; }
+.cart-success-icon { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; border-radius: 50%; color: #b7f4d0; background: rgba(64, 190, 123, .18); font-size: 14px; }
+@keyframes cart-success-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .auth-dialog .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
 .auth-dialog .confirm-actions a {
     display: inline-flex;
@@ -191,4 +195,5 @@ h1 { margin: 0; font-size: clamp(27px, 4vw, 40px); line-height: 1.2; }
     .product-visual img { transition: none; transform: none; will-change: auto; }
     .product-visual.is-interactive img { transform: none; }
     .product-visual::after { transition: none; }
+    .cart-success-toast { animation: none; }
 }

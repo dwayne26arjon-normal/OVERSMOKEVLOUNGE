@@ -162,7 +162,8 @@
         .staff-password-field input { display: block; width: 100%; margin: 0; padding: 9px 38px 9px 9px; border: 1px solid #302a3b; border-radius: 6px; background: #14111b; color: #fff; }
         .password-toggle { position: absolute; top: 50%; right: 7px; display: grid; width: 27px; height: 27px; place-items: center; padding: 4px; border-radius: 4px; color: #aaa4b2; transform: translateY(-50%); }
         .password-toggle:hover, .password-toggle:focus-visible { background: #211b2c; color: #fff; }
-        .password-toggle:focus-visible, .staff-remove-dialog-actions button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
+        .password-toggle:focus-visible { outline: none; }
+        .staff-remove-dialog-actions button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
         .password-toggle svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
         .password-eye-closed { display: none; }
         .password-toggle[aria-pressed="true"] .password-eye-open { display: none; }

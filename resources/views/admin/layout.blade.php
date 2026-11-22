@@ -86,7 +86,14 @@
         .panel { border: 1px solid #26212f; border-radius: 8px; background: linear-gradient(145deg, rgba(24, 21, 33, .92), rgba(17, 15, 23, .95)); }
         .panel-title { margin: 0; color: #e8e4ef; font-size: 11px; font-weight: 600; }
         .muted { color: #888291; }
-        .flash { margin-bottom: 16px; padding: 10px 12px; border: 1px solid rgba(112, 220, 170, .26); border-radius: 6px; background: rgba(30, 130, 80, .1); color: #9de2bd; font-size: 11px; }
+        .flash { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; width: min(440px, calc(100vw - 40px)); align-items: center; justify-content: space-between; gap: 14px; margin: 0; padding: 12px 14px; border: 1px solid rgba(112, 220, 170, .36); border-radius: 9px; background: rgba(17, 33, 27, .97); color: #9de2bd; box-shadow: 0 16px 42px rgba(0,0,0,.4); font-size: 11px; animation: flash-enter .22s ease-out; }
+        .flash[hidden] { display: none; }
+        .flash-dismiss { display: grid; width: 26px; height: 26px; flex: 0 0 26px; place-items: center; border: 0; border-radius: 5px; background: transparent; color: inherit; font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+        .flash-dismiss:hover, .flash-dismiss:focus-visible { background: rgba(255,255,255,.1); color: #fff; }
+        .flash-dismiss:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
+        @keyframes flash-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .flash { top: 12px; right: 12px; width: calc(100vw - 24px); } }
+        @media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
         .field-error { margin: 6px 0 0; color: #ff8e9b; font-size: 10px; }
         .table-wrap { overflow-x: auto; }
         .data-table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
@@ -208,7 +215,10 @@
 
             <main class="page-content">
                 @if (session('status'))
-                    <div class="flash" role="status">{{ session('status') }}</div>
+                    <div class="flash" data-admin-flash role="status" aria-live="polite">
+                        <span>{{ session('status') }}</span>
+                        <button class="flash-dismiss" type="button" data-dismiss-flash aria-label="Dismiss notification">×</button>
+                    </div>
                 @endif
                 @yield('content')
             </main>
@@ -216,6 +226,18 @@
     </div>
     <script>
         (() => {
+            const flash = document.querySelector('[data-admin-flash]');
+            if (flash) {
+                const dismissFlash = () => {
+                    flash.hidden = true;
+                };
+                const flashTimeout = window.setTimeout(dismissFlash, 5000);
+                flash.querySelector('[data-dismiss-flash]').addEventListener('click', () => {
+                    window.clearTimeout(flashTimeout);
+                    dismissFlash();
+                });
+            }
+
             const button = document.getElementById('adminProfileButton');
             const menu = document.getElementById('adminAccountMenu');
             if (!button || !menu) return;

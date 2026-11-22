@@ -43,7 +43,9 @@ class AdminStaffManagementTest extends TestCase
         $this->get(route('admin.staff.index'))
             ->assertOk()
             ->assertSee('Staff account removed.')
-            ->assertSee('Remove staff access?');
+            ->assertSee('Remove staff access?')
+            ->assertSee('data-admin-flash', false)
+            ->assertSee('data-dismiss-flash', false);
     }
 
     public function test_owner_can_create_another_admin_account(): void

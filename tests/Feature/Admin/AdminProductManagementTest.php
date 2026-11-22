@@ -269,6 +269,11 @@ class AdminProductManagementTest extends TestCase
 
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
         Storage::disk('public')->assertMissing($product->image_path);
+        $this->get(route('admin.products.index'))
+            ->assertOk()
+            ->assertSee('data-admin-flash', false)
+            ->assertSee('Product deleted successfully.')
+            ->assertSee('data-dismiss-flash', false);
     }
 
     public function test_admin_can_upload_promotional_artwork_and_configure_color_stock(): void

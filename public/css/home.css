@@ -335,7 +335,6 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 
 @media (prefers-reduced-motion: reduce) {
     .banner .shop { animation: none; }
-    .marquee-track { animation: none; }
     .card, .feature { transition-duration: .01ms; }
     .card.scroll-reveal { opacity: 1; transition: none; }
     .featured-slide.is-active, .featured-slide.is-active.slide-next, .featured-slide.is-active.slide-previous,

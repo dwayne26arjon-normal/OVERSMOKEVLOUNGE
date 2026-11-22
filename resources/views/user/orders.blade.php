@@ -90,7 +90,7 @@
                                     <div class="order-product-info">
                                         <span class="product-thumbnail">
                                             @if ($item->image_path)
-                                                <img src="{{ asset('storage/'.$item->image_path) }}" alt="">
+                                                <img src="{{ asset('storage/'.$item->image_path) }}?v={{ $item->updated_at->timestamp }}" alt="">
                                             @else
                                                 <span></span>
                                             @endif

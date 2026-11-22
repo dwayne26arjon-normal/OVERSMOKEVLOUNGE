@@ -105,7 +105,7 @@
                                 <article class="featured-slide{{ $loop->first ? ' is-active' : '' }}" data-featured-slide aria-roledescription="slide" aria-label="{{ $loop->iteration }} of {{ $featuredProducts->count() }}" @if (!$loop->first) hidden @endif>
                                     <a class="featured-product-image" href="{{ route('products.show', $featuredProduct->id) }}" aria-label="View {{ $featuredProduct->name }}">
                                         @if ($featuredProduct->featured_image_path || $featuredProduct->image_path)
-                                            <img class="{{ $featuredProduct->featured_image_path ? 'featured-artwork' : '' }}" src="{{ asset('storage/' . ($featuredProduct->featured_image_path ?: $featuredProduct->image_path)) }}" alt="{{ $featuredProduct->name }}">
+                                            <img class="{{ $featuredProduct->featured_image_path ? 'featured-artwork' : '' }}" src="{{ asset('storage/' . ($featuredProduct->featured_image_path ?: $featuredProduct->image_path)) }}?v={{ $featuredProduct->updated_at->timestamp }}" alt="{{ $featuredProduct->name }}">
                                         @else
                                             <span class="banner-featured-placeholder" aria-hidden="true"></span>
                                         @endif
@@ -167,7 +167,7 @@
                                 <span class="badge">Low stock</span>
                             @endif
                             @if ($product->image_path)
-                                <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}">
+                                <img src="{{ asset('storage/' . $product->image_path) }}?v={{ $product->updated_at->timestamp }}" alt="{{ $product->name }}">
                             @else
                                 <div class="placeholder"></div>
                             @endif

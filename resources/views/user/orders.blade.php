@@ -25,6 +25,15 @@
         .order-cancel-button { align-self: flex-start; padding: 8px 12px; border: 1px solid rgba(225,77,97,.4); border-radius: 6px; color: #ff9aa6; background: rgba(151,34,52,.12); font: inherit; font-size: 10px; cursor: pointer; }
         .order-cancel-button:hover { background: rgba(151,34,52,.24); }
         .order-page-status { margin: 0 0 16px; color: #60d9a1; font-size: 12px; }
+        .order-cancel-dialog { width: min(420px, calc(100% - 32px)); margin: auto; padding: 24px; border: 1px solid rgba(225,77,97,.4); border-radius: 14px; color: var(--text); background: #11111b; box-shadow: 0 24px 80px rgba(0,0,0,.55); }
+        .order-cancel-dialog::backdrop { background: rgba(5,5,12,.78); backdrop-filter: blur(6px); }
+        .order-cancel-dialog h2 { margin: 0; font-size: 18px; }
+        .order-cancel-dialog p { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+        .order-cancel-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+        .order-cancel-actions button { min-height: 36px; padding: 0 13px; border: 1px solid var(--line); border-radius: 7px; font: inherit; font-size: 11px; }
+        .order-cancel-keep { color: var(--text); background: rgba(255,255,255,.04); }
+        .order-cancel-confirm { border-color: rgba(225,77,97,.5) !important; color: #fff; background: #9c3043; }
+        .order-cancel-actions button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; }
     </style>
 </head>
 <body
@@ -111,7 +120,7 @@
                                 <div><dt>Shipping fee</dt><dd>₱{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                                 <div class="grand-total"><dt>Total</dt><dd>₱{{ number_format((float) $order->total, 2) }}</dd></div>
                             </dl>
-                            <form class="order-cancel-form" data-order-cancel method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('Cancel this order?')" @if ($order->status !== 'processing') hidden @endif>
+                            <form class="order-cancel-form" data-order-cancel method="POST" action="{{ route('orders.cancel', $order) }}" @if ($order->status !== 'processing') hidden @endif>
                                 @csrf
                                 <button class="order-cancel-button" type="submit">Cancel order</button>
                             </form>
@@ -121,9 +130,48 @@
             </section>
         @endif
     </main>
+    <dialog class="order-cancel-dialog" id="orderCancelDialog" aria-labelledby="orderCancelTitle" aria-describedby="orderCancelMessage">
+        <h2 id="orderCancelTitle">Cancel this order?</h2>
+        <p id="orderCancelMessage">This will cancel your order and return its items to stock.</p>
+        <div class="order-cancel-actions">
+            <button class="order-cancel-keep" id="keepOrderButton" type="button" autofocus>Keep order</button>
+            <button class="order-cancel-confirm" id="confirmOrderCancelButton" type="button">Yes, cancel order</button>
+        </div>
+    </dialog>
     <script>
         const cartKey = `oversmoke-cart-user-${document.body.dataset.userId}`;
         document.getElementById('cartCount').textContent = JSON.parse(localStorage.getItem(cartKey) || '[]').length;
+
+        const orderCancelDialog = document.getElementById('orderCancelDialog');
+        let pendingOrderCancelForm = null;
+
+        document.querySelectorAll('[data-order-cancel]').forEach(form => {
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                if (typeof orderCancelDialog.showModal !== 'function') {
+                    if (window.confirm('Cancel this order?')) form.submit();
+                    return;
+                }
+
+                pendingOrderCancelForm = form;
+                orderCancelDialog.showModal();
+            });
+        });
+
+        document.getElementById('keepOrderButton').addEventListener('click', () => orderCancelDialog.close());
+        document.getElementById('confirmOrderCancelButton').addEventListener('click', () => {
+            if (!pendingOrderCancelForm) return;
+
+            const form = pendingOrderCancelForm;
+            pendingOrderCancelForm = null;
+            form.submit();
+        });
+        orderCancelDialog.addEventListener('close', () => {
+            pendingOrderCancelForm = null;
+        });
+        orderCancelDialog.addEventListener('click', event => {
+            if (event.target === orderCancelDialog) orderCancelDialog.close();
+        });
     </script>
     <script src="{{ asset('js/account-menu.js') }}?v={{ filemtime(public_path('js/account-menu.js')) }}"></script>
     <script src="{{ asset('js/user-orders-live.js') }}?v={{ filemtime(public_path('js/user-orders-live.js')) }}"></script>

@@ -4,7 +4,6 @@ namespace Tests\Feature\User;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -183,6 +182,11 @@ class OrdersTest extends TestCase
             ->assertOk()
             ->assertSee($ownOrder->order_number)
             ->assertDontSee('OS-000002')
+            ->assertSee('id="orderCancelDialog"', false)
+            ->assertSee('Cancel this order?')
+            ->assertSee('Keep order')
+            ->assertSee('Yes, cancel order')
+            ->assertDontSee('onsubmit="return confirm(', false)
             ->assertSee('Saved to your account');
     }
 

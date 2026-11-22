@@ -160,16 +160,21 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
     Route::get('/profile/edit', fn () => view('user.profile-edit'))->name('profile.edit');
     Route::put('/profile', function (Request $request) {
         $user = $request->user('web');
+        $phone = $request->input('phone');
+        if (is_scalar($phone) && filled($phone)) {
+            $request->merge(['phone' => preg_replace('/\D+/', '', (string) $phone)]);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => ['nullable', 'string', 'regex:/^09[0-9]{9}$/'],
             'address' => ['nullable', 'string', 'max:500'],
             'street' => ['required_without:address', 'nullable', 'string', 'max:200'],
             'barangay' => ['required_without:address', 'nullable', 'string', 'max:80'],
             'city' => ['required_without:address', 'nullable', 'string', 'max:80'],
             'province' => ['required_without:address', 'nullable', 'string', 'max:80'],
-            'postal_code' => ['required_without:address', 'nullable', 'string', 'max:20'],
+            'postal_code' => ['required_without:address', 'nullable', 'string', 'regex:/^[0-9]{4}$/'],
             'current_password' => ['required_with:password', 'current_password'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
@@ -201,15 +206,20 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
     })->name('profile.update');
 
     Route::put('/profile/delivery-details', function (Request $request) {
+        $phone = $request->input('phone');
+        if (is_scalar($phone) && filled($phone)) {
+            $request->merge(['phone' => preg_replace('/\D+/', '', (string) $phone)]);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'phone' => ['required', 'string', 'max:30'],
+            'phone' => ['required', 'string', 'regex:/^09[0-9]{9}$/'],
             'address' => ['nullable', 'string', 'max:500'],
             'street' => ['required_without:address', 'nullable', 'string', 'max:200'],
             'barangay' => ['required_without:address', 'nullable', 'string', 'max:80'],
             'city' => ['required_without:address', 'nullable', 'string', 'max:80'],
             'province' => ['required_without:address', 'nullable', 'string', 'max:80'],
-            'postal_code' => ['required_without:address', 'nullable', 'string', 'max:20'],
+            'postal_code' => ['required_without:address', 'nullable', 'string', 'regex:/^[0-9]{4}$/'],
         ]);
 
         $user = $request->user('web');

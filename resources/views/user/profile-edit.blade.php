@@ -58,7 +58,7 @@
 
             <div class="field">
                 <label for="phone">Phone number</label>
-                <input id="phone" name="phone" type="tel" value="{{ old('phone', auth()->user()->phone) }}" autocomplete="tel" maxlength="30" placeholder="e.g. 09XXXXXXXXX">
+                <input id="phone" name="phone" type="tel" value="{{ preg_replace('/\D+/', '', (string) old('phone', auth()->user()->phone)) }}" autocomplete="tel" minlength="11" maxlength="11" pattern="09[0-9]{9}" inputmode="numeric" title="Enter an 11-digit Philippine mobile number starting with 09." placeholder="09XXXXXXXXX">
                 @error('phone')<p class="error">{{ $message }}</p>@enderror
             </div>
 
@@ -92,7 +92,7 @@
 
             <div class="field">
                 <label for="postal_code">Postal code</label>
-                <input id="postal_code" name="postal_code" type="text" value="{{ old('postal_code', auth()->user()->postal_code) }}" autocomplete="postal-code" required maxlength="20" inputmode="numeric">
+                <input id="postal_code" name="postal_code" type="text" value="{{ old('postal_code', auth()->user()->postal_code) }}" autocomplete="postal-code" required minlength="4" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" title="Enter a 4-digit Philippine postal code.">
                 @error('postal_code')<p class="error">{{ $message }}</p>@enderror
             </div>
 

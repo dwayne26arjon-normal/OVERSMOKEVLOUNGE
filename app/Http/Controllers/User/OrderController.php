@@ -71,19 +71,26 @@ class OrderController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $customer = $request->input('customer');
+        $phone = is_array($customer) ? ($customer['phone'] ?? null) : null;
+        if (is_array($customer) && is_scalar($phone) && filled($phone)) {
+            $customer['phone'] = preg_replace('/\D+/', '', (string) $phone);
+            $request->merge(['customer' => $customer]);
+        }
+
         $data = $request->validate([
             'items' => ['required', 'array', 'min:1', 'max:50'],
             'items.*.id' => ['required', 'integer'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
             'items.*.color' => ['nullable', 'string', 'max:50'],
             'customer.name' => ['required', 'string', 'max:120'],
-            'customer.phone' => ['required', 'string', 'max:30'],
+            'customer.phone' => ['required', 'string', 'regex:/^09[0-9]{9}$/'],
             'customer.address' => ['nullable', 'string', 'max:500'],
             'customer.street' => ['required_without:customer.address', 'nullable', 'string', 'max:200'],
             'customer.barangay' => ['required_without:customer.address', 'nullable', 'string', 'max:80'],
             'customer.city' => ['required_without:customer.address', 'nullable', 'string', 'max:80'],
             'customer.province' => ['required_without:customer.address', 'nullable', 'string', 'max:80'],
-            'customer.postal_code' => ['required_without:customer.address', 'nullable', 'string', 'max:20'],
+            'customer.postal_code' => ['required_without:customer.address', 'nullable', 'string', 'regex:/^[0-9]{4}$/'],
             'payment_method' => ['required', 'in:Cash on delivery'],
         ]);
 

@@ -54,7 +54,7 @@
             </div>
             <div class="field">
                 <label for="phone">Phone number</label>
-                <input id="phone" name="phone" type="tel" value="{{ auth()->user()->phone }}" autocomplete="tel" required maxlength="30" placeholder="e.g. 09XXXXXXXXX">
+                <input id="phone" name="phone" type="tel" value="{{ preg_replace('/\D+/', '', (string) auth()->user()->phone) }}" autocomplete="tel" required minlength="11" maxlength="11" pattern="09[0-9]{9}" inputmode="numeric" title="Enter an 11-digit Philippine mobile number starting with 09." placeholder="09XXXXXXXXX">
             </div>
             @if (! auth()->user()->street && auth()->user()->address)
                 <p class="field-hint field-wide">Your saved address is shown above. Enter it in the fields below so each part is saved separately.</p>
@@ -77,7 +77,7 @@
             </div>
             <div class="field">
                 <label for="postalCode">Postal code</label>
-                <input id="postalCode" name="postal_code" type="text" value="{{ auth()->user()->postal_code }}" autocomplete="postal-code" required maxlength="20" inputmode="numeric">
+                <input id="postalCode" name="postal_code" type="text" value="{{ auth()->user()->postal_code }}" autocomplete="postal-code" required minlength="4" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" title="Enter a 4-digit Philippine postal code.">
             </div>
             <div class="field">
                 <label for="paymentMethod">Payment method</label>

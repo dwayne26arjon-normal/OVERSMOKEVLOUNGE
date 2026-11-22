@@ -19,7 +19,7 @@ class ProfileTest extends TestCase
         $response = $this->actingAs($user)->put(route('profile.update'), [
             'name' => 'Updated Name',
             'email' => 'updated@example.com',
-            'phone' => '09123456789',
+            'phone' => '0912 345 6789',
             'address' => '123 Example Street, Quezon City',
         ]);
 
@@ -49,7 +49,7 @@ class ProfileTest extends TestCase
         $this->put(route('profile.update'), [
             'name' => 'Updated Customer',
             'email' => $customer->email,
-            'phone' => '09123456789',
+            'phone' => '0912 345 6789',
             'address' => '123 Example Street, Quezon City',
         ])->assertRedirect(route('profile.edit'));
 
@@ -265,8 +265,37 @@ class ProfileTest extends TestCase
                 ->assertSee('name="barangay"', false)
                 ->assertSee('name="city"', false)
                 ->assertSee('name="province"', false)
-                ->assertSee('name="postal_code"', false);
+                ->assertSee('name="postal_code"', false)
+                ->assertSee('pattern="09[0-9]{9}"', false)
+                ->assertSee('pattern="[0-9]{4}"', false);
         }
+    }
+
+    public function test_delivery_details_reject_invalid_phone_and_postal_code(): void
+    {
+        $user = User::factory()->create();
+        $payload = [
+            'name' => 'Delivery Name',
+            'phone' => '0912345678',
+            'street' => '123 Example Street',
+            'barangay' => 'San Isidro',
+            'city' => 'Makati',
+            'province' => 'Metro Manila',
+            'postal_code' => '1234',
+        ];
+
+        $this->actingAs($user)
+            ->putJson(route('profile.delivery.update'), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('phone');
+
+        $payload['phone'] = '09123456789';
+        $payload['postal_code'] = '123';
+
+        $this->actingAs($user)
+            ->putJson(route('profile.delivery.update'), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('postal_code');
     }
 
     public function test_password_change_requires_the_current_password(): void

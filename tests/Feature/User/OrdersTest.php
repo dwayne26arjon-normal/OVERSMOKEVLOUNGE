@@ -40,7 +40,7 @@ class OrdersTest extends TestCase
                 ],
                 'customer' => [
                     'name' => 'Delivery Customer',
-                    'phone' => '09123456789',
+                    'phone' => '0912 345 6789',
                     'street' => '123 Example Street',
                     'barangay' => 'San Isidro',
                     'city' => 'Makati',
@@ -56,6 +56,7 @@ class OrdersTest extends TestCase
         $order = Order::with('items')->firstOrFail();
         $this->assertSame($customer->id, $order->user_id);
         $this->assertSame('customer@example.com', $order->customer_email);
+        $this->assertSame('09123456789', $order->customer_phone);
         $this->assertSame('Cloud Berry', $order->items->first()->product_name);
         $this->assertSame('450.00', $order->items->first()->unit_price);
         $this->assertSame('123 Example Street, San Isidro, Makati, Metro Manila, 1234', $order->delivery_address);
@@ -117,6 +118,46 @@ class OrdersTest extends TestCase
 
         $this->assertDatabaseCount('orders', 0);
         $this->assertSame(1, $product->fresh()->stock);
+    }
+
+    public function test_order_submission_rejects_invalid_phone_and_postal_code(): void
+    {
+        $customer = User::factory()->create();
+        $product = Product::create([
+            'name' => 'Test Pod',
+            'category' => 'Devices',
+            'price' => 1200,
+            'stock' => 5,
+            'is_active' => true,
+        ]);
+        $payload = [
+            'items' => [['id' => $product->id, 'quantity' => 1]],
+            'customer' => [
+                'name' => 'Delivery Customer',
+                'phone' => '0912345678',
+                'street' => '123 Example Street',
+                'barangay' => 'San Isidro',
+                'city' => 'Makati',
+                'province' => 'Metro Manila',
+                'postal_code' => '1234',
+            ],
+            'payment_method' => 'Cash on delivery',
+        ];
+
+        $this->actingAs($customer)
+            ->postJson(route('orders.store'), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('customer.phone');
+
+        $payload['customer']['phone'] = '09123456789';
+        $payload['customer']['postal_code'] = '123';
+
+        $this->actingAs($customer)
+            ->postJson(route('orders.store'), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('customer.postal_code');
+
+        $this->assertDatabaseCount('orders', 0);
     }
 
     public function test_customer_order_reserves_the_selected_variant_stock(): void

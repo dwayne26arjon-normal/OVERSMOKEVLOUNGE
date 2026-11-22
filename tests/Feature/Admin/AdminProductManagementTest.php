@@ -68,6 +68,13 @@ class AdminProductManagementTest extends TestCase
             'stock' => 0,
             'is_active' => true,
         ]);
+        Product::create([
+            'name' => 'Nic Salt',
+            'category' => 'E-liquids',
+            'price' => 500,
+            'stock' => 20,
+            'is_active' => true,
+        ]);
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.inventory.index', [
@@ -79,7 +86,23 @@ class AdminProductManagementTest extends TestCase
             ->assertSee('IN STOCK')
             ->assertSee('LOW STOCKS')
             ->assertSee('OUT OF STOCK')
+            ->assertSee('id="inventory-stock"', false)
+            ->assertSee('>Apply</button>', false)
             ->assertSeeInOrder(['Mint Cloud', 'Berry Cloud'])
+            ->assertDontSee('Pod Device');
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.inventory.index', ['stock' => 'empty']))
+            ->assertOk()
+            ->assertSee('Pod Device')
+            ->assertDontSee('Berry Cloud')
+            ->assertDontSee('Nic Salt');
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.inventory.index', ['stock' => 'in_stock']))
+            ->assertOk()
+            ->assertSee('Nic Salt')
+            ->assertDontSee('Mint Cloud')
             ->assertDontSee('Pod Device');
     }
 
@@ -235,8 +258,14 @@ class AdminProductManagementTest extends TestCase
             'stock' => 12,
         ]);
 
+        $this->get(route('admin.products.index'))
+            ->assertOk()
+            ->assertSee('id="deleteConfirmDialog"', false)
+            ->assertSee('Delete product?');
+
         $this->delete(route('admin.products.destroy', $product))
-            ->assertRedirect(route('admin.products.index'));
+            ->assertRedirect(route('admin.products.index'))
+            ->assertSessionHas('status', 'Product deleted successfully.');
 
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
         Storage::disk('public')->assertMissing($product->image_path);

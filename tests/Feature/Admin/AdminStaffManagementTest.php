@@ -19,7 +19,9 @@ class AdminStaffManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Staff accounts')
             ->assertSee('class="nav-icon nav-icon-svg"', false)
-            ->assertSee('<circle cx="12" cy="8" r="3.5"/>', false);
+            ->assertSee('<circle cx="12" cy="8" r="3.5"/>', false)
+            ->assertSee('data-password-toggle', false)
+            ->assertSee('id="staffRemoveDialog"', false);
 
         $this->post(route('admin.staff.store'), [
             'name' => 'Store Staff',
@@ -33,9 +35,15 @@ class AdminStaffManagementTest extends TestCase
         $this->assertTrue($staff->is_staff);
 
         $this->delete(route('admin.staff.destroy', $staff))
-            ->assertRedirect(route('admin.staff.index'));
+            ->assertRedirect(route('admin.staff.index'))
+            ->assertSessionHas('status', 'Staff account removed.');
 
         $this->assertDatabaseMissing('users', ['email' => 'staff@example.com']);
+
+        $this->get(route('admin.staff.index'))
+            ->assertOk()
+            ->assertSee('Staff account removed.')
+            ->assertSee('Remove staff access?');
     }
 
     public function test_owner_can_create_another_admin_account(): void

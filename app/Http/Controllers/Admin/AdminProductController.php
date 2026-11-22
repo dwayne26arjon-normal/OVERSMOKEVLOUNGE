@@ -237,6 +237,7 @@ class AdminProductController extends Controller
                 });
             })
             ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')->toString()))
+            ->when($request->input('stock') === 'in_stock', fn ($query) => $query->where('stock', '>', 10))
             ->when($request->input('stock') === 'low', fn ($query) => $query->where('stock', '>', 0)->where('stock', '<=', 10))
             ->when($request->input('stock') === 'empty', fn ($query) => $query->where('stock', 0))
             ->when($request->input('sort') === 'low', fn ($query) => $query->orderByRaw('CASE WHEN stock = 0 THEN 1 ELSE 0 END')->orderBy('stock'))

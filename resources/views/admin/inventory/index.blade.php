@@ -48,6 +48,13 @@
                     <option value="{{ $category }}" @selected(request('category') === $category)>{{ $category }}</option>
                 @endforeach
             </select>
+            <label class="sr-only" for="inventory-stock">Filter by stock status</label>
+            <select id="inventory-stock" name="stock">
+                <option value="">All stock statuses</option>
+                <option value="in_stock" @selected(request('stock') === 'in_stock')>In stock</option>
+                <option value="low" @selected(request('stock') === 'low')>Low stock</option>
+                <option value="empty" @selected(request('stock') === 'empty')>Out of stock</option>
+            </select>
             <label class="sr-only" for="inventory-sort">Sort inventory</label>
             <select id="inventory-sort" name="sort">
                 <option value="">Sort by: Newest</option>
@@ -55,10 +62,10 @@
                 <option value="name" @selected(request('sort') === 'name')>Sort by: Name</option>
                 <option value="stock" @selected(request('sort') === 'stock')>Sort by: Most stock</option>
             </select>
-            @if (request()->filled('stock'))
-                <input type="hidden" name="stock" value="{{ request('stock') }}">
-            @endif
             <button class="filter-submit" type="submit">Apply</button>
+            @if (request()->hasAny(['q', 'stock', 'category', 'sort']))
+                <a class="inventory-clear-link" href="{{ route('admin.inventory.index') }}">Clear</a>
+            @endif
         </form>
 
         @if ($products->isEmpty())
@@ -150,7 +157,10 @@
         .search-field > span { position: absolute; top: 3px; right: 9px; color: #8d8798; font-size: 15px; pointer-events: none; }
         .inventory-filters select { width: auto; min-width: 105px; }
         .inventory-filters select:last-of-type { min-width: 120px; }
-        .filter-submit { display: none; }
+        .filter-submit { min-height: 27px; padding: 0 11px; border: 1px solid #5235a0; border-radius: 5px; background: #211a34; color: #d7caff; font: inherit; font-size: 9px; cursor: pointer; }
+        .filter-submit:hover { background: #32234f; }
+        .inventory-clear-link { color: #a995dc; font-size: 9px; text-decoration: none; white-space: nowrap; }
+        .inventory-clear-link:hover { color: #fff; }
         .inventory-table { min-width: 580px; }
         .inventory-table th { padding: 8px 10px; font-size: 8px; }
         .inventory-table td { padding: 7px 10px; font-size: 9px; }

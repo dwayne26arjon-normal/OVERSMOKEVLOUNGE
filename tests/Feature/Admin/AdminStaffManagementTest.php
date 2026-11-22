@@ -21,6 +21,7 @@ class AdminStaffManagementTest extends TestCase
             ->assertSee('class="nav-icon nav-icon-svg"', false)
             ->assertSee('<circle cx="12" cy="8" r="3.5"/>', false)
             ->assertSee('data-password-toggle', false)
+            ->assertSee('.password-toggle:focus-visible { outline: none; }', false)
             ->assertSee('id="staffRemoveDialog"', false);
 
         $this->post(route('admin.staff.store'), [

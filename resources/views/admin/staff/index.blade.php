@@ -160,7 +160,7 @@
     <style>
         .staff-password-field { position: relative; margin-top: 6px; }
         .staff-password-field input { display: block; width: 100%; margin: 0; padding: 9px 38px 9px 9px; border: 1px solid #302a3b; border-radius: 6px; background: #14111b; color: #fff; }
-        .password-toggle { position: absolute; top: 50%; right: 7px; display: grid; width: 27px; height: 27px; place-items: center; padding: 4px; border-radius: 4px; color: #aaa4b2; transform: translateY(-50%); }
+        .password-toggle { position: absolute; top: 50%; right: 7px; display: grid; width: 27px; height: 27px; place-items: center; padding: 4px; border: 0; border-radius: 4px; outline: none; background: transparent; color: #aaa4b2; appearance: none; cursor: pointer; transform: translateY(-50%); }
         .password-toggle:hover, .password-toggle:focus-visible { background: #211b2c; color: #fff; }
         .password-toggle:focus-visible { outline: none; }
         .staff-remove-dialog-actions button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }

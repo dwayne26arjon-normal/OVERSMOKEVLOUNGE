@@ -41,7 +41,11 @@ class AdminProductManagementTest extends TestCase
             ->get(route('admin.inventory.index', ['stock' => 'low']))
             ->assertOk()
             ->assertSee('Pod Device')
-            ->assertSee('Low stock');
+            ->assertSee('Low stock')
+            ->assertSee('id="inventoryDeleteDialog"', false)
+            ->assertSee('data-inventory-delete-form', false)
+            ->assertSee('.delete-confirm-dialog::backdrop', false)
+            ->assertDontSee('onsubmit="return confirm(', false);
     }
 
     public function test_admin_inventory_shows_product_counts_and_filters_by_category_and_stock(): void

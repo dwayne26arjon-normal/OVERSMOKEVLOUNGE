@@ -108,10 +108,10 @@
                                     <a class="icon-action edit-action" href="{{ route('admin.products.edit', $product) }}" aria-label="Edit {{ $product->name }}" title="Edit product">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
                                     </a>
-                                    <form method="POST" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('Delete this product? This cannot be undone.');">
+                                    <form id="delete-inventory-product-{{ $product->id }}" method="POST" action="{{ route('admin.products.destroy', $product) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="icon-action delete-action" type="submit" aria-label="Delete {{ $product->name }}" title="Delete product">
+                                        <button class="icon-action delete-action" type="button" data-inventory-delete-form="delete-inventory-product-{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Delete {{ $product->name }}" title="Delete product">
                                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
                                         </button>
                                     </form>
@@ -130,6 +130,18 @@
             </div>
         @endif
     </section>
+
+    <dialog class="delete-confirm-dialog inventory-delete-dialog" id="inventoryDeleteDialog" aria-labelledby="inventoryDeleteTitle" aria-describedby="inventoryDeleteMessage">
+        <div class="delete-dialog-icon" aria-hidden="true">!</div>
+        <h2 id="inventoryDeleteTitle">Delete product?</h2>
+        <p id="inventoryDeleteMessage">This action cannot be undone.</p>
+        <div class="delete-dialog-actions">
+            <form method="dialog">
+                <button class="secondary-button" type="submit">Cancel</button>
+            </form>
+            <button class="delete-confirm-button" id="confirmInventoryDelete" type="button">Delete product</button>
+        </div>
+    </dialog>
 @endsection
 
 @push('styles')
@@ -185,7 +197,43 @@
         .inventory-footer .pagination { border: 0; padding: 0; }
         .inventory-footer .pagination nav { align-items: center; }
         .inventory-footer .pagination a, .inventory-footer .pagination span[aria-current] span, .inventory-footer .pagination span[aria-disabled] span { min-width: 20px; height: 20px; font-size: 8px; }
+        .delete-confirm-dialog { width: min(390px, calc(100vw - 32px)); padding: 24px; border: 1px solid #393044; border-radius: 12px; background: #17141f; color: #f4f1ff; box-shadow: 0 22px 70px rgba(0,0,0,.55); }
+        .delete-confirm-dialog::backdrop { background: rgba(5,4,8,.72); backdrop-filter: blur(3px); }
+        .delete-dialog-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgba(255,120,136,.3); border-radius: 50%; background: rgba(151,34,52,.15); color: #ff7888; font-size: 20px; font-weight: 700; }
+        .delete-confirm-dialog h2 { margin: 15px 0 6px; font: 600 17px 'Outfit', sans-serif; }
+        .delete-confirm-dialog p { margin: 0; color: #aaa4b2; font-size: 11px; line-height: 1.5; }
+        .delete-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
+        .delete-dialog-actions form { margin: 0; }
+        .delete-confirm-button { min-height: 32px; padding: 0 12px; border: 1px solid #9a3445; border-radius: 6px; background: #8d293a; color: #fff; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .delete-confirm-button:hover { background: #a83246; }
         @media (max-width: 760px) { .inventory-filters { flex-wrap: wrap; }.search-field { flex-basis: 100%; }.inventory-filters select { flex: 1; }.inventory-stats { gap: 7px; } }
         @media (max-width: 420px) { .inventory-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }.inventory-footer { align-items: flex-start; flex-direction: column; padding: 8px 10px; } }
     </style>
+@endpush
+
+@push('scripts')
+    <script>
+        const inventoryDeleteDialog = document.getElementById('inventoryDeleteDialog');
+        const inventoryDeleteMessage = document.getElementById('inventoryDeleteMessage');
+        const confirmInventoryDelete = document.getElementById('confirmInventoryDelete');
+        let pendingInventoryDeleteForm = null;
+
+        document.querySelectorAll('[data-inventory-delete-form]').forEach(button => {
+            button.addEventListener('click', () => {
+                pendingInventoryDeleteForm = document.getElementById(button.dataset.inventoryDeleteForm);
+                inventoryDeleteMessage.textContent = `Delete "${button.dataset.productName}"? This action cannot be undone.`;
+                if (typeof inventoryDeleteDialog.showModal !== 'function') {
+                    if (window.confirm(inventoryDeleteMessage.textContent)) pendingInventoryDeleteForm.requestSubmit();
+                    return;
+                }
+                inventoryDeleteDialog.showModal();
+                confirmInventoryDelete.focus();
+            });
+        });
+
+        confirmInventoryDelete.addEventListener('click', () => pendingInventoryDeleteForm?.requestSubmit());
+        inventoryDeleteDialog.addEventListener('click', event => {
+            if (event.target === inventoryDeleteDialog) inventoryDeleteDialog.close();
+        });
+    </script>
 @endpush

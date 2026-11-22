@@ -33,6 +33,9 @@
                 if (!validStatuses.has(order.status)) return;
 
                 const status = cards.get(String(order.id)).querySelector('[data-order-status]');
+                const card = cards.get(String(order.id));
+                const cancelForm = card.querySelector('[data-order-cancel]');
+                if (cancelForm) cancelForm.hidden = order.status !== 'processing';
                 if (!status || status.textContent.trim().toLowerCase() === order.status) return;
 
                 status.className = `order-status status-${order.status}`;

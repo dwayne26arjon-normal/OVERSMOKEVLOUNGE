@@ -49,6 +49,23 @@ class AdminOrderManagementTest extends TestCase
             ->assertSee('Cloud Berry');
     }
 
+    public function test_admin_can_filter_orders_by_status_with_the_status_dropdown(): void
+    {
+        $admin = $this->createAdmin();
+        $processingOrder = $this->createOrder();
+        $shippedOrder = $this->createOrder();
+        $shippedOrder->update(['status' => 'shipped']);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.orders.index', ['status' => 'shipped']))
+            ->assertOk()
+            ->assertSee('id="order-status-filter"', false)
+            ->assertSee('onchange="this.form.requestSubmit()"', false)
+            ->assertSee('value="shipped" selected', false)
+            ->assertSee($shippedOrder->order_number)
+            ->assertDontSee($processingOrder->order_number);
+    }
+
     public function test_admin_order_notifications_are_persistent_and_can_be_marked_read(): void
     {
         $admin = $this->createAdmin();

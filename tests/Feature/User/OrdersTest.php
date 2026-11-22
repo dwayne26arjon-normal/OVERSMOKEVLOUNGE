@@ -186,6 +186,87 @@ class OrdersTest extends TestCase
             ->assertSee('Saved to your account');
     }
 
+    public function test_customer_can_cancel_a_processing_order_and_restore_inventory(): void
+    {
+        $customer = User::factory()->create();
+        $product = Product::create([
+            'name' => 'Cloud Berry',
+            'category' => 'E-liquids',
+            'price' => 450,
+            'stock' => 8,
+            'is_active' => true,
+        ]);
+        $variant = $product->variants()->create(['name' => 'Berry Ice', 'stock' => 3]);
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'customer_name' => 'Test Customer',
+            'customer_email' => $customer->email,
+            'customer_phone' => '09123456789',
+            'delivery_address' => '123 Example Street',
+            'payment_method' => 'Cash on delivery',
+            'status' => 'processing',
+            'subtotal' => 900,
+            'shipping_fee' => 0,
+            'total' => 900,
+        ]);
+        $order->items()->create([
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'category' => $product->category,
+            'color' => $variant->name,
+            'quantity' => 2,
+            'unit_price' => 450,
+        ]);
+
+        $this->actingAs($customer)
+            ->post(route('orders.cancel', $order))
+            ->assertRedirect(route('orders'))
+            ->assertSessionHas('status', 'Your order has been cancelled.');
+
+        $this->assertSame('cancelled', $order->fresh()->status);
+        $this->assertSame(10, $product->fresh()->stock);
+        $this->assertSame(5, $variant->fresh()->stock);
+
+        $this->actingAs($customer)
+            ->get(route('orders'))
+            ->assertOk()
+            ->assertSee('Your order has been cancelled.')
+            ->assertSee('Cancelled')
+            ->assertSee('data-order-cancel', false)
+            ->assertSee('hidden', false);
+    }
+
+    public function test_customer_cannot_cancel_another_customers_order_or_an_order_past_processing(): void
+    {
+        $customer = User::factory()->create();
+        $otherCustomer = User::factory()->create();
+        $attributes = [
+            'customer_name' => 'Test Customer',
+            'customer_email' => $customer->email,
+            'customer_phone' => '09123456789',
+            'delivery_address' => '123 Example Street',
+            'payment_method' => 'Cash on delivery',
+            'subtotal' => 450,
+            'shipping_fee' => 0,
+            'total' => 450,
+        ];
+        $otherOrder = Order::create($attributes + ['user_id' => $otherCustomer->id]);
+        $shippedOrder = Order::create($attributes + ['user_id' => $customer->id, 'status' => 'shipped']);
+
+        $this->actingAs($customer)
+            ->post(route('orders.cancel', $otherOrder))
+            ->assertNotFound();
+
+        $this->actingAs($customer)
+            ->from(route('orders'))
+            ->post(route('orders.cancel', $shippedOrder))
+            ->assertRedirect(route('orders'))
+            ->assertSessionHasErrors('order');
+
+        $this->assertSame('processing', $otherOrder->fresh()->status);
+        $this->assertSame('shipped', $shippedOrder->fresh()->status);
+    }
+
     public function test_customer_order_updates_return_only_their_current_statuses(): void
     {
         $customer = User::factory()->create();

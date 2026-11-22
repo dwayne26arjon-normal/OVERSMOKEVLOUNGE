@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Notifications\NewOrderReceived;
 use App\Notifications\OrderStatusUpdated;
+use App\Support\OrderInventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -78,6 +79,11 @@ class AdminOrderController extends Controller
 
     public function index(Request $request): View
     {
+        $statuses = ['processing', 'shipped', 'completed', 'cancelled'];
+        $request->validate([
+            'status' => ['nullable', Rule::in($statuses)],
+        ]);
+
         $orders = Order::query()
             ->when($request->filled('q'), function ($query) use ($request) {
                 $search = $request->string('q')->trim()->toString();
@@ -93,7 +99,7 @@ class AdminOrderController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders', 'statuses'));
     }
 
     public function show(Order $order): View
@@ -119,15 +125,7 @@ class AdminOrderController extends Controller
                 ->map(fn ($productItems) => $productItems->sum('quantity'));
 
             if ($lockedOrder->status !== 'cancelled' && $data['status'] === 'cancelled') {
-                foreach ($quantities as $productId => $quantity) {
-                    Product::query()->whereKey($productId)->increment('stock', $quantity);
-                }
-                foreach ($items->whereNotNull('product_id')->whereNotNull('color') as $item) {
-                    ProductVariant::query()
-                        ->where('product_id', $item->product_id)
-                        ->where('name', $item->color)
-                        ->increment('stock', $item->quantity);
-                }
+                OrderInventory::restoreForCancellation($lockedOrder);
             } elseif ($lockedOrder->status === 'cancelled' && $data['status'] !== 'cancelled') {
                 $products = Product::query()
                     ->whereIn('id', $quantities->keys())

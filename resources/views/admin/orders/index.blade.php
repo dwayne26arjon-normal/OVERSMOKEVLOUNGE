@@ -24,9 +24,9 @@
                 <label class="sr-only" for="order-search">Search orders or customers</label>
                 <input id="order-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search order or customer...">
                 <label class="sr-only" for="order-status-filter">Filter by order status</label>
-                <select id="order-status-filter" name="status">
+                <select id="order-status-filter" name="status" onchange="this.form.requestSubmit()">
                     <option value="">All statuses</option>
-                    @foreach (['processing', 'shipped', 'completed', 'cancelled'] as $status)
+                    @foreach ($statuses as $status)
                         <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
                     @endforeach
                 </select>
@@ -81,7 +81,7 @@
         .orders-filters input, .orders-filters select { height: 31px; padding: 0 10px; border: 1px solid #302a3b; border-radius: 5px; outline: 0; background: #13111a; color: #ded9e7; font: inherit; font-size: 9px; }
         .orders-filters input { width: min(280px, 42vw); }
         .orders-filters input:focus, .orders-filters select:focus { border-color: #7045eb; }
-        .orders-filters select { min-width: 115px; }
+        .orders-filters select { min-width: 135px; }
         .orders-filters .secondary-button { min-height: 31px; }
         .sales-export-dropdown { position: relative; }
         .sales-export-dropdown > summary { min-height: 32px; cursor: pointer; list-style: none; }

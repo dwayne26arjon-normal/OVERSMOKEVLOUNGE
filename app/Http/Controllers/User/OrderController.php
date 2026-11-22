@@ -9,7 +9,10 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Notifications\NewOrderReceived;
 use App\Notifications\OrderPlaced;
+use App\Notifications\OrderStatusUpdated;
+use App\Support\OrderInventory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -37,6 +40,32 @@ class OrderController extends Controller
 
         return response()->json(['orders' => $orders])
             ->header('Cache-Control', 'no-store');
+    }
+
+    public function cancel(Request $request, int $order): RedirectResponse
+    {
+        $orderId = DB::transaction(function () use ($request, $order) {
+            $lockedOrder = Order::query()
+                ->where('user_id', $request->user()->id)
+                ->with('items')
+                ->lockForUpdate()
+                ->findOrFail($order);
+
+            if ($lockedOrder->status !== 'processing') {
+                throw ValidationException::withMessages([
+                    'order' => ['Only processing orders can be cancelled.'],
+                ]);
+            }
+
+            OrderInventory::restoreForCancellation($lockedOrder);
+            $lockedOrder->update(['status' => 'cancelled']);
+
+            return $lockedOrder->id;
+        });
+
+        $request->user()->notify(new OrderStatusUpdated(Order::query()->findOrFail($orderId)));
+
+        return redirect()->route('orders')->with('status', 'Your order has been cancelled.');
     }
 
     public function store(Request $request): JsonResponse

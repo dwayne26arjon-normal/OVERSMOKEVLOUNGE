@@ -21,6 +21,10 @@
         .order-totals .grand-total { color: var(--text); font-size: 12px; font-weight: 600; }
         .order-list-note { color: var(--muted); font-size: 10px; }
         .order-list-note[hidden] { display: none; }
+        .order-cancel-form[hidden] { display: none; }
+        .order-cancel-button { align-self: flex-start; padding: 8px 12px; border: 1px solid rgba(225,77,97,.4); border-radius: 6px; color: #ff9aa6; background: rgba(151,34,52,.12); font: inherit; font-size: 10px; cursor: pointer; }
+        .order-cancel-button:hover { background: rgba(151,34,52,.24); }
+        .order-page-status { margin: 0 0 16px; color: #60d9a1; font-size: 12px; }
     </style>
 </head>
 <body
@@ -58,6 +62,9 @@
                 <span class="storage-note">Saved to your account</span>
             </div>
         </div>
+        @if (session('status'))
+            <p class="order-page-status" role="status">{{ session('status') }}</p>
+        @endif
 
         @if ($orders->isEmpty())
             <section class="empty-state">
@@ -104,6 +111,10 @@
                                 <div><dt>Shipping fee</dt><dd>₱{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                                 <div class="grand-total"><dt>Total</dt><dd>₱{{ number_format((float) $order->total, 2) }}</dd></div>
                             </dl>
+                            <form class="order-cancel-form" data-order-cancel method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('Cancel this order?')" @if ($order->status !== 'processing') hidden @endif>
+                                @csrf
+                                <button class="order-cancel-button" type="submit">Cancel order</button>
+                            </form>
                         </footer>
                     </article>
                 @endforeach

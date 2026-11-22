@@ -151,6 +151,7 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
     Route::get('/orders/updates', [OrderController::class, 'updates'])->name('orders.updates');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->whereNumber('order')->name('orders.cancel');
 });
 
 Route::middleware(['auth:web', 'customer'])->group(function () {

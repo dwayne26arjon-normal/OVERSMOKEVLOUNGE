@@ -78,6 +78,18 @@ class PublicBrowsingTest extends TestCase
             ->assertSee('featured-label">Featured', false);
     }
 
+    public function test_home_feature_cards_use_the_supplied_icon_images(): void
+    {
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee(asset('images/features/authenticity.png'), false)
+            ->assertSee(asset('images/features/delivery.png'), false)
+            ->assertSee(asset('images/features/price.png'), false)
+            ->assertDontSee('💨')
+            ->assertDontSee('🚀')
+            ->assertDontSee('💜');
+    }
+
     public function test_product_details_provides_search_for_many_options(): void
     {
         $product = Product::create([

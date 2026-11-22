@@ -207,9 +207,9 @@
             </div>
 
             <section class="features">
-                <div class="feature"><div class="ico">💨</div><h3>100% Authentic</h3><p>Original na products mula sa trusted brands.</p></div>
-                <div class="feature"><div class="ico">🚀</div><h3>Fast Delivery</h3><p>Mabilis na pag-ship, diretso sa pinto mo.</p></div>
-                <div class="feature"><div class="ico">💜</div><h3>Best Price</h3><p>Sulit na presyo, may mga promo pa.</p></div>
+                <div class="feature"><div class="ico" aria-hidden="true"><img src="{{ asset('images/features/authenticity.png') }}" alt="" loading="lazy"></div><h3>100% Authentic</h3><p>Original na products mula sa trusted brands.</p></div>
+                <div class="feature"><div class="ico" aria-hidden="true"><img src="{{ asset('images/features/delivery.png') }}" alt="" loading="lazy"></div><h3>Fast Delivery</h3><p>Mabilis na pag-ship, diretso sa pinto mo.</p></div>
+                <div class="feature"><div class="ico" aria-hidden="true"><img src="{{ asset('images/features/price.png') }}" alt="" loading="lazy"></div><h3>Best Price</h3><p>Sulit na presyo, may mga promo pa.</p></div>
             </section>
 
             <footer class="footer">

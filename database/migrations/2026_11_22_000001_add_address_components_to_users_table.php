@@ -8,19 +8,46 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('street', 200)->nullable();
-            $table->string('barangay', 80)->nullable();
-            $table->string('city', 80)->nullable();
-            $table->string('province', 80)->nullable();
-            $table->string('postal_code', 20)->nullable();
+        $columns = [
+            'street' => 200,
+            'barangay' => 80,
+            'city' => 80,
+            'province' => 80,
+            'postal_code' => 20,
+        ];
+        $missingColumns = [];
+
+        foreach ($columns as $name => $length) {
+            if (! Schema::hasColumn('users', $name)) {
+                $missingColumns[$name] = $length;
+            }
+        }
+
+        if ($missingColumns === []) {
+            return;
+        }
+
+        Schema::table('users', function (Blueprint $table) use ($missingColumns) {
+            foreach ($missingColumns as $name => $length) {
+                $table->string($name, $length)->nullable();
+            }
         });
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['street', 'barangay', 'city', 'province', 'postal_code']);
+        $columns = ['street', 'barangay', 'city', 'province', 'postal_code'];
+        $existingColumns = array_values(array_filter(
+            $columns,
+            fn (string $column) => Schema::hasColumn('users', $column)
+        ));
+
+        if ($existingColumns === []) {
+            return;
+        }
+
+        Schema::table('users', function (Blueprint $table) use ($existingColumns) {
+            $table->dropColumn($existingColumns);
         });
     }
 };

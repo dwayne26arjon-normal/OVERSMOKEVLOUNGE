@@ -25,6 +25,7 @@
         .nav-link:hover { background: #171320; color: #f4f1ff; }
         .nav-link.active { border-color: rgba(130, 88, 255, .16); background: linear-gradient(90deg, rgba(100, 54, 236, .28), rgba(90, 50, 180, .1)); color: #cdbdff; }
         .nav-icon { display: block; width: 16px; height: 16px; flex: 0 0 16px; object-fit: contain; opacity: .9; }
+        .nav-icon-svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
         .nav-link.active .nav-icon { opacity: 1; }
         .nav-link.disabled { color: #625d6b; cursor: not-allowed; }
         .nav-link.disabled .nav-icon { opacity: .45; }
@@ -106,7 +107,10 @@
         .table-action:hover { color: #fff; }
         .empty-state { padding: 38px 16px; color: #888291; font-size: 11px; text-align: center; }
         .pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #26212f; padding: 11px 12px; color: #888291; font-size: 9px; }
-        .pagination nav { display: flex; gap: 5px; }
+        .pagination nav { display: flex; flex: 0 0 auto; justify-content: flex-end; }
+        .pagination nav > div:first-child, .pagination nav > div:nth-child(2) > div:first-child { display: none; }
+        .pagination nav > div:nth-child(2), .pagination nav > div:nth-child(2) > div:last-child { display: flex; align-items: center; justify-content: flex-end; }
+        .pagination nav > div:nth-child(2) > div:last-child > span { display: flex; align-items: center; gap: 4px; }
         .pagination a, .pagination span[aria-current] span, .pagination span[aria-disabled] span { display: inline-grid; min-width: 24px; height: 24px; place-items: center; border: 1px solid #302a3b; border-radius: 5px; color: #c3bdce; text-decoration: none; }
         .pagination span[aria-current] span { border-color: #6543bb; background: #281e3d; color: #e1d7ff; }
         .pagination span[aria-disabled] span { color: #615b6a; }
@@ -149,7 +153,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/inventory.png') }}" alt=""><span class="nav-text">Inventory</span></a>
                 <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/orders.png') }}" alt=""><span class="nav-text">Orders</span></a>
                 @if (auth('admin')->user()->is_admin)
-                    <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/settings.png') }}" alt=""><span class="nav-text">Staff</span></a>
+                    <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c0-4 2.8-6.5 7-6.5s7 2.5 7 6.5"/></svg><span class="nav-text">Staff</span></a>
                 @endif
                 <span class="nav-link disabled" aria-disabled="true" title="Settings are not available in the admin area yet"><img class="nav-icon" src="{{ asset('images/admin-icons/settings.png') }}" alt=""><span class="nav-text">Settings</span></span>
             </nav>

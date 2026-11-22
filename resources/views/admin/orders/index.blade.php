@@ -22,7 +22,7 @@
         <div class="orders-toolbar">
             <form class="orders-filters" method="GET" action="{{ route('admin.orders.index') }}">
                 <label class="sr-only" for="order-search">Search orders or customers</label>
-                <input id="order-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search order or customer...">
+                <input id="order-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search order or customer..." onchange="this.form.requestSubmit()">
                 <label class="sr-only" for="order-status-filter">Filter by order status</label>
                 <select id="order-status-filter" name="status" onchange="this.form.requestSubmit()">
                     <option value="">All statuses</option>
@@ -30,7 +30,6 @@
                         <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
                     @endforeach
                 </select>
-                <button class="secondary-button" type="submit">Filter</button>
                 @if (request()->hasAny(['q', 'status']))
                     <a class="table-action" href="{{ route('admin.orders.index') }}">Clear</a>
                 @endif
@@ -77,12 +76,12 @@
         .orders-panel { overflow: hidden; }
         .orders-heading { align-items: center; flex-wrap: wrap; }
         .orders-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px; border-bottom: 1px solid #26212f; }
-        .orders-filters { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .orders-filters { display: flex; min-width: 0; align-items: center; gap: 8px; flex: 1; }
         .orders-filters input, .orders-filters select { height: 31px; padding: 0 10px; border: 1px solid #302a3b; border-radius: 5px; outline: 0; background: #13111a; color: #ded9e7; font: inherit; font-size: 9px; }
-        .orders-filters input { width: min(280px, 42vw); }
+        .orders-filters input { width: min(280px, 42vw); min-width: 0; flex: 1; }
         .orders-filters input:focus, .orders-filters select:focus { border-color: #7045eb; }
-        .orders-filters select { min-width: 135px; }
-        .orders-filters .secondary-button { min-height: 31px; }
+        .orders-filters select { width: 150px; min-width: 135px; flex: 0 0 150px; }
+        .orders-filters .table-action { flex: 0 0 auto; white-space: nowrap; }
         .sales-export-dropdown { position: relative; }
         .sales-export-dropdown > summary { min-height: 32px; cursor: pointer; list-style: none; }
         .sales-export-dropdown > summary::-webkit-details-marker { display: none; }
@@ -98,6 +97,6 @@
         .status-shipped { border-color: rgba(72,143,240,.3); background: rgba(30,59,102,.2); color: #73adff; }
         .status-completed { border-color: rgba(48,180,122,.24); background: rgba(28,125,81,.1); color: #60d9a1; }
         .status-cancelled { border-color: rgba(225,77,97,.27); background: rgba(151,34,52,.12); color: #ff7888; }
-        @media (max-width: 620px) { .orders-filters { flex-wrap: wrap; }.orders-filters input { width: 100%; flex-basis: 100%; }.orders-filters select { flex: 1; } }
+        @media (max-width: 620px) { .orders-filters { flex-wrap: wrap; }.orders-filters input { width: 100%; flex: 1 1 100%; }.orders-filters select { width: auto; flex: 1; } }
     </style>
 @endpush

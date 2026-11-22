@@ -61,6 +61,12 @@ class AdminOrderManagementTest extends TestCase
             ->assertOk()
             ->assertSee('id="order-status-filter"', false)
             ->assertSee('onchange="this.form.requestSubmit()"', false)
+            ->assertSee('All statuses')
+            ->assertSee('Processing')
+            ->assertSee('Shipped')
+            ->assertSee('Completed')
+            ->assertSee('Cancelled')
+            ->assertDontSee('>Filter</button>', false)
             ->assertSee('value="shipped" selected', false)
             ->assertSee($shippedOrder->order_number)
             ->assertDontSee($processingOrder->order_number);

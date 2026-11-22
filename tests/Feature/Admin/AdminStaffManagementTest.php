@@ -17,7 +17,9 @@ class AdminStaffManagementTest extends TestCase
 
         $this->get(route('admin.staff.index'))
             ->assertOk()
-            ->assertSee('Staff accounts');
+            ->assertSee('Staff accounts')
+            ->assertSee('class="nav-icon nav-icon-svg"', false)
+            ->assertSee('<circle cx="12" cy="8" r="3.5"/>', false);
 
         $this->post(route('admin.staff.store'), [
             'name' => 'Store Staff',

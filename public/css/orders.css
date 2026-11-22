@@ -36,8 +36,19 @@ h1 { margin: 0; font-size: clamp(27px, 4vw, 36px); }
 .heading-meta { display: flex; align-items: center; gap: 10px; }
 .order-count { padding: 5px 10px; border: 1px solid rgba(124,92,240,.32); border-radius: 999px; color: #d4caff; background: rgba(124,92,240,.1); font-size: 10px; font-weight: 500; }
 .storage-note { color: var(--muted); font-size: 10px; }
+.order-filters { display: flex; gap: 7px; overflow-x: auto; margin: 0 0 16px; padding: 2px 0 8px; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.order-filters::-webkit-scrollbar { display: none; }
+.order-filter { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 8px 13px; border: 1px solid transparent; border-radius: 999px; color: var(--muted); background: transparent; font-size: 11px; white-space: nowrap; transition: border-color .2s ease, color .2s ease, background .2s ease; }
+.order-filter:hover { color: var(--text); background: rgba(124,92,240,.08); }
+.order-filter[aria-pressed="true"] { border-color: rgba(124,92,240,.38); color: #d4caff; background: rgba(124,92,240,.14); }
+.order-filter:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
+.order-filter-count { display: inline-grid; min-width: 20px; height: 18px; place-items: center; padding: 0 5px; border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.07); font-size: 9px; font-variant-numeric: tabular-nums; }
+.order-filter[aria-pressed="true"] .order-filter-count { color: #fff; background: rgba(124,92,240,.42); }
 .orders-list { display: grid; gap: 14px; }
 .order-card { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(145deg, rgba(20,20,30,.97), rgba(13,13,20,.96)); box-shadow: 0 8px 26px rgba(0,0,0,.12); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.order-card[hidden] { display: none; }
+.filtered-empty { margin: 0; padding: 22px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); background: rgba(16,16,24,.75); font-size: 12px; text-align: center; }
+.filtered-empty[hidden] { display: none; }
 .order-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 18px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.018); }
 .order-reference { display: grid; gap: 3px; }
 .order-reference strong { font-size: 12px; font-weight: 600; }
@@ -93,6 +104,8 @@ h1 { margin: 0; font-size: clamp(27px, 4vw, 36px); }
     .page { width: calc(100% - 28px); margin-top: 20px; }
     .page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 18px; }
     .heading-meta { flex-wrap: wrap; }
+    .order-filters { gap: 4px; }
+    .order-filter { gap: 6px; padding: 8px 10px; font-size: 10px; }
     .order-header, .order-footer { padding-right: 12px; padding-left: 12px; }
     .order-products { padding-right: 12px; padding-left: 12px; }
     .order-product { gap: 10px; }

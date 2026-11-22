@@ -83,9 +83,26 @@
                 <a href="{{ url('/home#products') }}">Browse products</a>
             </section>
         @else
+            <div class="order-filters" role="group" aria-label="Filter orders by status">
+                <button class="order-filter" type="button" data-order-filter="all" aria-pressed="true">
+                    All <span class="order-filter-count" data-order-filter-count="all">{{ $orders->count() }}</span>
+                </button>
+                <button class="order-filter" type="button" data-order-filter="processing" aria-pressed="false">
+                    To Ship <span class="order-filter-count" data-order-filter-count="processing">{{ $orders->where('status', 'processing')->count() }}</span>
+                </button>
+                <button class="order-filter" type="button" data-order-filter="shipped" aria-pressed="false">
+                    To Receive <span class="order-filter-count" data-order-filter-count="shipped">{{ $orders->where('status', 'shipped')->count() }}</span>
+                </button>
+                <button class="order-filter" type="button" data-order-filter="completed" aria-pressed="false">
+                    Completed <span class="order-filter-count" data-order-filter-count="completed">{{ $orders->where('status', 'completed')->count() }}</span>
+                </button>
+                <button class="order-filter" type="button" data-order-filter="cancelled" aria-pressed="false">
+                    Cancelled <span class="order-filter-count" data-order-filter-count="cancelled">{{ $orders->where('status', 'cancelled')->count() }}</span>
+                </button>
+            </div>
             <section class="orders-list" aria-label="Order history">
                 @foreach ($orders as $order)
-                    <article class="order-card" id="order-{{ $order->id }}" data-order-id="{{ $order->id }}">
+                    <article class="order-card" id="order-{{ $order->id }}" data-order-id="{{ $order->id }}" data-order-state="{{ $order->status }}">
                         <header class="order-header">
                             <div class="order-reference">
                                 <strong>{{ $order->order_number }}</strong>
@@ -128,6 +145,7 @@
                     </article>
                 @endforeach
             </section>
+            <p class="filtered-empty" data-orders-filter-empty role="status" hidden>No orders in this category yet.</p>
         @endif
     </main>
     <dialog class="order-cancel-dialog" id="orderCancelDialog" aria-labelledby="orderCancelTitle" aria-describedby="orderCancelMessage">

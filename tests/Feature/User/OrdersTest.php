@@ -236,6 +236,40 @@ class OrdersTest extends TestCase
             ->assertSee('Saved to your account');
     }
 
+    public function test_customer_orders_page_groups_orders_by_status_and_counts_only_their_orders(): void
+    {
+        $customer = User::factory()->create();
+        $otherCustomer = User::factory()->create();
+        $attributes = [
+            'customer_name' => 'Test Customer',
+            'customer_email' => 'customer@example.com',
+            'customer_phone' => '09123456789',
+            'delivery_address' => '123 Example Street',
+            'payment_method' => 'Cash on delivery',
+            'subtotal' => 450,
+            'shipping_fee' => 0,
+            'total' => 450,
+        ];
+
+        foreach (['processing', 'shipped', 'completed', 'cancelled'] as $status) {
+            Order::create($attributes + ['user_id' => $customer->id, 'status' => $status]);
+        }
+        Order::create($attributes + ['user_id' => $otherCustomer->id, 'status' => 'processing']);
+
+        $this->actingAs($customer)
+            ->get(route('orders'))
+            ->assertOk()
+            ->assertSee('To Ship')
+            ->assertSee('To Receive')
+            ->assertSee('Completed')
+            ->assertSee('Cancelled')
+            ->assertSee('data-order-filter-count="all">4</span>', false)
+            ->assertSee('data-order-filter-count="processing">1</span>', false)
+            ->assertSee('data-order-filter-count="shipped">1</span>', false)
+            ->assertSee('data-order-filter-count="completed">1</span>', false)
+            ->assertSee('data-order-filter-count="cancelled">1</span>', false);
+    }
+
     public function test_customer_can_cancel_a_processing_order_and_restore_inventory(): void
     {
         $customer = User::factory()->create();

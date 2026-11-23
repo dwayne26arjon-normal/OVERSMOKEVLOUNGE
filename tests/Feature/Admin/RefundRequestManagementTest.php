@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\RefundRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class RefundRequestManagementTest extends TestCase
@@ -117,6 +118,39 @@ class RefundRequestManagementTest extends TestCase
             ->assertSee($refundRequest->order->order_number);
     }
 
+    public function test_admin_can_preview_uploaded_image_evidence(): void
+    {
+        Storage::fake('local');
+        $admin = $this->createAdmin();
+        $refundRequest = $this->createRefundRequest();
+        $path = 'refund-evidence/damaged-bottle.png';
+        Storage::disk('local')->put(
+            $path,
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lS8AAAAASUVORK5CYII=')
+        );
+        $evidence = $refundRequest->evidences()->create([
+            'disk' => 'local',
+            'path' => $path,
+            'original_name' => 'damaged-bottle.png',
+            'mime_type' => 'image/png',
+            'size' => 100,
+        ]);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refunds.show', $refundRequest))
+            ->assertOk()
+            ->assertSee('alt="Refund evidence photo 1"', false)
+            ->assertSee(route('admin.refund-evidence.preview', $evidence), false)
+            ->assertDontSee('damaged-bottle.png');
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refund-evidence.preview', $evidence))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png')
+            ->assertHeader('X-Content-Type-Options', 'nosniff')
+            ->assertHeader('Cache-Control', 'no-store, private');
+    }
+
     public function test_only_admins_and_staff_can_review_refund_requests(): void
     {
         $customer = User::factory()->create();
@@ -135,6 +169,10 @@ class RefundRequestManagementTest extends TestCase
 
         $this->actingAs($customer, 'web')
             ->get(route('admin.refund-evidence.download', $evidence))
+            ->assertForbidden();
+
+        $this->actingAs($customer, 'web')
+            ->get(route('admin.refund-evidence.preview', $evidence))
             ->assertForbidden();
     }
 

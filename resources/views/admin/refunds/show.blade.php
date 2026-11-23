@@ -52,14 +52,22 @@
             @if ($refundRequest->evidences->isEmpty())
                 <p class="refund-muted">No files were attached.</p>
             @else
-                <ul class="refund-evidence">
+                <div class="refund-evidence-grid">
                     @foreach ($refundRequest->evidences as $evidence)
-                        <li>
-                            <span>{{ $evidence->original_name }} · {{ number_format($evidence->size / 1048576, 1) }} MB</span>
-                            <a href="{{ route('admin.refund-evidence.download', $evidence) }}">Download</a>
-                        </li>
+                        <figure class="refund-evidence-card">
+                            @if (str_starts_with($evidence->mime_type, 'image/'))
+                                <img src="{{ route('admin.refund-evidence.preview', $evidence) }}" alt="Refund evidence photo {{ $loop->iteration }}" loading="lazy">
+                                <figcaption>Photo {{ $loop->iteration }} · {{ number_format($evidence->size / 1048576, 1) }} MB</figcaption>
+                            @elseif (str_starts_with($evidence->mime_type, 'video/'))
+                                <video src="{{ route('admin.refund-evidence.preview', $evidence) }}" controls playsinline preload="metadata" aria-label="Refund evidence video {{ $loop->iteration }}"></video>
+                                <figcaption>Video {{ $loop->iteration }} · {{ number_format($evidence->size / 1048576, 1) }} MB</figcaption>
+                            @else
+                                <figcaption>Preview unavailable · {{ number_format($evidence->size / 1048576, 1) }} MB</figcaption>
+                            @endif
+                            <a href="{{ route('admin.refund-evidence.download', $evidence) }}">Download file</a>
+                        </figure>
                     @endforeach
-                </ul>
+                </div>
             @endif
 
             @if ($refundRequest->admin_note)
@@ -137,10 +145,12 @@
         .refund-items { display: grid; gap: 7px; margin: 0; padding-left: 17px; color: #c8c2d2; font-size: 10px; line-height: 1.5; }
         .refund-description { margin: 0; color: #d4cedd; font-size: 11px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
         .refund-muted { margin: 0 0 12px; color: #96909f; font-size: 10px; line-height: 1.55; }
-        .refund-evidence { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-        .refund-evidence li { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #c8c2d2; font-size: 10px; overflow-wrap: anywhere; }
-        .refund-evidence a { flex: 0 0 auto; color: #c4b1ff; text-decoration: none; }
-        .refund-evidence a:hover { color: #fff; }
+        .refund-evidence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .refund-evidence-card { display: grid; min-width: 0; gap: 7px; margin: 0; padding: 8px; border: 1px solid #302a3b; border-radius: 6px; background: #13111a; }
+        .refund-evidence-card img, .refund-evidence-card video { display: block; width: 100%; max-height: 260px; aspect-ratio: 4 / 3; border-radius: 4px; background: #09080d; object-fit: contain; }
+        .refund-evidence-card figcaption { color: #a9a2b1; font-size: 9px; }
+        .refund-evidence-card a { color: #c4b1ff; font-size: 9px; text-decoration: none; }
+        .refund-evidence-card a:hover { color: #fff; }
         .refund-review-card { margin-top: 12px; }
         .refund-review-form { display: grid; max-width: 560px; gap: 12px; }
         .refund-review-form label { display: block; margin-bottom: 5px; color: #c8c2d2; font-size: 10px; }

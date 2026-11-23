@@ -116,6 +116,7 @@ class RefundRequestTest extends TestCase
             ->assertSee(route('orders.refunds.store', $processingOrder), false)
             ->assertDontSee(route('orders.refunds.store', $cancelledOrder), false)
             ->assertSee('enctype="multipart/form-data"', false)
+            ->assertSee('data-refund-preview', false)
             ->assertSee('video/mp4');
     }
 

@@ -35,6 +35,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/refund-requests/{refundRequest}', [RefundRequestController::class, 'show'])->name('refunds.show');
         Route::patch('/refund-requests/{refundRequest}', [RefundRequestController::class, 'update'])->name('refunds.update');
         Route::get('/refund-evidence/{evidence}/download', [RefundRequestController::class, 'downloadEvidence'])->whereNumber('evidence')->name('refund-evidence.download');
+        Route::get('/refund-evidence/{evidence}/preview', [RefundRequestController::class, 'previewEvidence'])->whereNumber('evidence')->name('refund-evidence.preview');
         Route::get('/products', [AdminProductController::class, 'products'])->name('products.index');
         Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
         Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');

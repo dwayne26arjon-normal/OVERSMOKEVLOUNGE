@@ -40,6 +40,11 @@
         .refund-request-form label { color: var(--muted); font-size: 10px; }
         .refund-request-form textarea, .refund-request-form input[type="file"] { width: 100%; padding: 9px; border: 1px solid var(--line); border-radius: 6px; background: #11111b; color: var(--text); font: inherit; font-size: 11px; }
         .refund-request-form textarea { min-height: 90px; resize: vertical; }
+        .refund-upload-previews { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+        .refund-upload-previews:empty { display: none; }
+        .refund-upload-preview { display: grid; gap: 5px; margin: 0; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: #11111b; }
+        .refund-upload-preview img, .refund-upload-preview video { display: block; width: 100%; max-height: 180px; aspect-ratio: 4 / 3; border-radius: 4px; background: #09080d; object-fit: contain; }
+        .refund-upload-preview figcaption { color: var(--muted); font-size: 9px; }
         .refund-request-help { margin: -4px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
         .refund-submit-button { justify-self: start; min-height: 36px; padding: 0 13px; border: 1px solid rgba(225,77,97,.4); border-radius: 6px; color: #fff; background: #8d293a; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
         .refund-submit-button:hover { background: #a83246; }
@@ -194,7 +199,8 @@
                                         <label for="refund-description-{{ $order->id }}">Describe the damage and identify the affected item(s)</label>
                                         <textarea id="refund-description-{{ $order->id }}" name="description" maxlength="2000" required placeholder="Tell us what arrived damaged and which item was affected.">{{ (int) old('refund_order_id') === $order->id ? old('description') : '' }}</textarea>
                                         <label for="refund-attachments-{{ $order->id }}">Photos or video (optional)</label>
-                                        <input id="refund-attachments-{{ $order->id }}" type="file" name="attachments[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple>
+                                        <input id="refund-attachments-{{ $order->id }}" type="file" name="attachments[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple data-refund-attachments>
+                                        <div class="refund-upload-previews" data-refund-preview aria-live="polite"></div>
                                         <p class="refund-request-help">Up to 3 files; JPG, PNG, WebP, MP4, MOV, or WebM, up to 12 MB each. Attachments are private and visible only to you and store staff. One request per order.</p>
                                         <button class="refund-submit-button" type="submit">Submit refund request</button>
                                     </form>
@@ -232,6 +238,48 @@
 
                 pendingOrderCancelForm = form;
                 orderCancelDialog.showModal();
+            });
+        });
+
+        document.querySelectorAll('[data-refund-attachments]').forEach(input => {
+            const previewContainer = input.closest('form').querySelector('[data-refund-preview]');
+            let previewUrls = [];
+
+            input.addEventListener('change', () => {
+                previewUrls.forEach(url => URL.revokeObjectURL(url));
+                previewUrls = [];
+                previewContainer.replaceChildren();
+
+                Array.from(input.files || []).forEach((file, index) => {
+                    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return;
+
+                    const url = URL.createObjectURL(file);
+                    previewUrls.push(url);
+                    const preview = document.createElement('figure');
+                    preview.className = 'refund-upload-preview';
+
+                    if (file.type.startsWith('image/')) {
+                        const image = document.createElement('img');
+                        image.src = url;
+                        image.alt = `Selected refund photo ${index + 1}`;
+                        preview.append(image);
+                    } else {
+                        const video = document.createElement('video');
+                        video.src = url;
+                        video.controls = true;
+                        video.playsInline = true;
+                        video.preload = 'metadata';
+                        video.setAttribute('aria-label', `Selected refund video ${index + 1}`);
+                        preview.append(video);
+                    }
+
+                    const caption = document.createElement('figcaption');
+                    caption.textContent = file.type.startsWith('image/')
+                        ? `Photo preview ${index + 1}`
+                        : `Video preview ${index + 1}`;
+                    preview.append(caption);
+                    previewContainer.append(preview);
+                });
             });
         });
 

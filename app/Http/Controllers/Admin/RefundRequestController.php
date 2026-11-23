@@ -132,4 +132,31 @@ class RefundRequestController extends Controller
             ],
         );
     }
+
+    public function previewEvidence(RefundEvidence $evidence)
+    {
+        abort_unless(in_array($evidence->mime_type, [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'video/mp4',
+            'video/quicktime',
+            'video/webm',
+        ], true), 404);
+        abort_unless($evidence->disk === 'local', 404);
+
+        $disk = Storage::disk('local');
+        abort_unless($disk->exists($evidence->path), 404);
+
+        $response = response()->file($disk->path($evidence->path), [
+            'Content-Type' => $evidence->mime_type,
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-store',
+            'Content-Security-Policy' => "default-src 'none'; sandbox",
+        ]);
+        $response->setPrivate();
+        $response->headers->addCacheControlDirective('no-store');
+
+        return $response;
+    }
 }

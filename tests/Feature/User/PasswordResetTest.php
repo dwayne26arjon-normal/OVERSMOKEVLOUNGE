@@ -128,7 +128,10 @@ class PasswordResetTest extends TestCase
 
         $this->get(route('password.reset'))
             ->assertOk()
-            ->assertSee('Choose a new password');
+            ->assertSee('Choose a new password')
+            ->assertSee('data-password-toggle', false)
+            ->assertSee('aria-controls="password"', false)
+            ->assertSee('aria-controls="password_confirmation"', false);
 
         $this->post(route('password.store'), [
             'password' => 'new-password-123',

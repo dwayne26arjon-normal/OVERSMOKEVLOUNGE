@@ -52,6 +52,7 @@ class AdminPasswordResetController extends Controller
                 DB::table('password_reset_tokens')->where('email', $admin->email)->delete();
                 Log::error('Admin password reset email delivery failed.', [
                     'exception' => $exception::class,
+                    'reason' => $exception->getMessage(),
                 ]);
 
                 throw ValidationException::withMessages([

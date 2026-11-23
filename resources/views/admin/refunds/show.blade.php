@@ -12,9 +12,6 @@
         <span class="refund-status status-{{ $refundRequest->status }}">{{ ucfirst($refundRequest->status) }}</span>
     </div>
 
-    @if (session('status'))
-        <div class="refund-flash" role="status">{{ session('status') }}</div>
-    @endif
     @if ($errors->any())
         <div class="refund-error" role="alert">
             @foreach ($errors->all() as $error)
@@ -130,8 +127,7 @@
         .refund-heading p { margin: 5px 0 0; color: #888291; font-size: 10px; }
         .refund-back-link { color: #a995dc; font-size: 10px; text-decoration: none; }
         .refund-back-link:hover { color: #fff; }
-        .refund-flash, .refund-error { margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(48,180,122,.3); border-radius: 6px; color: #8de0b6; background: rgba(28,125,81,.1); font-size: 10px; }
-        .refund-error { border-color: rgba(225,77,97,.3); color: #ff9aa7; background: rgba(151,34,52,.12); }
+        .refund-error { margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(225,77,97,.3); border-radius: 6px; color: #ff9aa7; background: rgba(151,34,52,.12); font-size: 10px; }
         .refund-error p { margin: 0; }
         .refund-detail-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 12px; }
         .refund-detail-card, .refund-review-card { min-width: 0; padding: 16px; }
@@ -178,6 +174,14 @@
 
             refundStatus.addEventListener('change', updateRefundFields);
             updateRefundFields();
+
+            const reviewForm = document.getElementById('refund-review-form');
+            reviewForm.addEventListener('submit', event => {
+                if (refundStatus.value !== 'approved') return;
+
+                const confirmation = `Approve this refund request for ₱${amountField.value}? This records your decision for the customer to see in their order history. No payment will be sent by this website.`;
+                if (!window.confirm(confirmation)) event.preventDefault();
+            });
         }
     </script>
 @endpush

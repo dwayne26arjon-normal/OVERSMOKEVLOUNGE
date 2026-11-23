@@ -114,9 +114,15 @@ class RefundRequestController extends Controller
             ]);
         });
 
+        $statusMessage = match ($data['status']) {
+            'approved' => 'Refund request approved. The customer can view the decision in their order history.',
+            'rejected' => 'Refund request declined.',
+            'refunded' => 'Refund marked as manually completed.',
+        };
+
         return redirect()
             ->route('admin.refunds.show', $refundRequest)
-            ->with('status', 'Refund request updated.');
+            ->with('status', $statusMessage);
     }
 
     public function downloadEvidence(RefundEvidence $evidence)

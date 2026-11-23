@@ -36,6 +36,7 @@ class RefundRequestManagementTest extends TestCase
             ->assertSee('Damage description')
             ->assertSee('The package arrived damaged.')
             ->assertSee('Approve request')
+            ->assertSee('Approve this refund request for', false)
             ->assertSee('Approval records an amount but does not transfer money.');
 
         $this->actingAs($admin, 'admin')
@@ -44,7 +45,8 @@ class RefundRequestManagementTest extends TestCase
                 'approved_amount' => '125.50',
                 'admin_note' => 'Approved for the damaged item.',
             ])
-            ->assertRedirect(route('admin.refunds.show', $refundRequest));
+            ->assertRedirect(route('admin.refunds.show', $refundRequest))
+            ->assertSessionHas('status', 'Refund request approved. The customer can view the decision in their order history.');
 
         $this->assertDatabaseHas('refund_requests', [
             'id' => $refundRequest->id,

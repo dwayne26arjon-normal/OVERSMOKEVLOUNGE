@@ -41,6 +41,30 @@ class PasswordResetTest extends TestCase
         Notification::assertSentTo($customer, CustomerPasswordResetCode::class);
     }
 
+    public function test_customer_repeating_a_reset_request_is_redirected_to_code_entry(): void
+    {
+        Notification::fake();
+        $customer = User::factory()->create([
+            'email' => 'customer@example.com',
+        ]);
+
+        $this->post(route('password.email'), [
+            'email' => $customer->email,
+        ])->assertRedirect(route('password.code', ['email' => $customer->email]));
+
+        $this->post(route('password.email'), [
+            'email' => $customer->email,
+        ])->assertRedirect(route('password.code', ['email' => $customer->email]))
+            ->assertSessionHas('status', 'If an account exists for that email address, a reset code has been sent. Wait a minute before requesting another code.');
+
+        $this->get(route('password.code', ['email' => $customer->email]))
+            ->assertOk()
+            ->assertSee('Enter your verification code')
+            ->assertSee('name="code"', false);
+
+        Notification::assertSentTo($customer, CustomerPasswordResetCode::class);
+    }
+
     public function test_unknown_email_gets_generic_password_reset_response(): void
     {
         Notification::fake();

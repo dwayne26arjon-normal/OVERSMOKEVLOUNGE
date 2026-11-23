@@ -46,7 +46,9 @@ class PasswordResetController extends Controller
         if ($customer) {
             $existingCode = DB::table('password_reset_tokens')->where('email', $customer->email)->first();
             if ($existingCode && now()->diffInSeconds(Carbon::parse($existingCode->created_at)) < 60) {
-                return back()->with('status', __('If an account exists for that email address, a reset code has been sent. Wait a minute before requesting another code.'));
+                return redirect()
+                    ->route('password.code', ['email' => $email])
+                    ->with('status', __('If an account exists for that email address, a reset code has been sent. Wait a minute before requesting another code.'));
             }
 
             $code = (string) random_int(100000, 999999);

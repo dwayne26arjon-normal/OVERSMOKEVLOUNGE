@@ -15,16 +15,17 @@
         .order-status.status-shipped { border-color: rgba(72,143,240,.35); color: #73adff; background: rgba(30,59,102,.2); }
         .order-status.status-completed { border-color: rgba(48,180,122,.3); color: #60d9a1; background: rgba(28,125,81,.1); }
         .order-status.status-cancelled { border-color: rgba(225,77,97,.35); color: #ff7888; background: rgba(151,34,52,.12); }
-        .order-totals { display: grid; gap: 5px; margin-left: auto; min-width: 190px; }
+        .order-totals { display: grid; grid-column: 1 / -1; width: 100%; min-width: 0; gap: 5px; margin: 0; }
         .order-totals div { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 10px; }
         .order-totals dt, .order-totals dd { margin: 0; }
         .order-totals .grand-total { color: var(--text); font-size: 12px; font-weight: 600; }
         .order-list-note { color: var(--muted); font-size: 10px; }
         .order-list-note[hidden] { display: none; }
         .order-cancel-form[hidden] { display: none; }
-        .order-footer { flex-wrap: wrap; }
-        .order-cancel-form { flex: 0 0 auto; margin: 0; }
-        .order-cancel-button { display: inline-flex; min-width: max-content; align-items: center; justify-content: center; padding: 8px 12px; border: 1px solid rgba(225,77,97,.4); border-radius: 6px; color: #ff9aa6; background: rgba(151,34,52,.12); font: inherit; font-size: 10px; white-space: nowrap; cursor: pointer; }
+        .order-footer { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; gap: 12px; }
+        .order-footer > .delivery-info { grid-column: 1 / -1; min-width: 0; }
+        .order-cancel-form { justify-self: start; width: max-content; max-width: 100%; margin: 0; }
+        .order-cancel-button { display: inline-flex; width: max-content; max-width: 100%; min-width: max-content; align-items: center; justify-content: center; padding: 8px 12px; border: 1px solid rgba(225,77,97,.4); border-radius: 6px; color: #ff9aa6; background: rgba(151,34,52,.12); font: inherit; font-size: 10px; white-space: nowrap; word-break: keep-all; cursor: pointer; }
         .order-cancel-button:hover { background: rgba(151,34,52,.24); }
         .order-page-status { margin: 0 0 16px; color: #60d9a1; font-size: 12px; }
         .order-cancel-dialog { width: min(420px, calc(100% - 32px)); margin: auto; padding: 24px; border: 1px solid rgba(225,77,97,.4); border-radius: 14px; color: var(--text); background: #11111b; box-shadow: 0 24px 80px rgba(0,0,0,.55); }
@@ -36,9 +37,10 @@
         .order-cancel-keep { color: var(--text); background: rgba(255,255,255,.04); }
         .order-cancel-confirm { border-color: rgba(225,77,97,.5) !important; color: #fff; background: #9c3043; }
         .order-cancel-actions button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; }
-        .refund-request-details { flex: 1 0 100%; width: 100%; min-width: 0; padding: 12px; border: 1px solid rgba(225,77,97,.3); border-radius: 9px; background: linear-gradient(135deg, rgba(151,34,52,.11), rgba(17,17,27,.88)); box-shadow: inset 0 1px rgba(255,255,255,.025); transition: border-color .2s, background .2s; }
+        .refund-request-details { grid-column: 1 / -1; width: 100%; min-width: 0; padding: 12px; border: 1px solid rgba(225,77,97,.3); border-radius: 9px; background: linear-gradient(135deg, rgba(151,34,52,.11), rgba(17,17,27,.88)); box-shadow: inset 0 1px rgba(255,255,255,.025); transition: border-color .2s, background .2s; }
         .refund-request-details[open] { border-color: rgba(225,77,97,.55); background: linear-gradient(135deg, rgba(151,34,52,.16), rgba(17,17,27,.96)); }
-        .refund-request-details summary { display: flex; min-height: 38px; align-items: center; gap: 9px; color: #ffb1b8; font-size: 11px; font-weight: 600; list-style: none; cursor: pointer; }
+        .refund-request-details summary { display: flex; min-height: 38px; align-items: center; gap: 9px; padding: 0; border: 0; color: #ffb1b8; background: transparent; font-size: 11px; font-weight: 600; list-style: none; cursor: pointer; }
+        .refund-request-details summary:focus-visible { border-radius: 4px; outline: 2px solid rgba(255,177,184,.75); outline-offset: 3px; }
         .refund-request-details summary::-webkit-details-marker { display: none; }
         .refund-request-details summary::before { display: grid; width: 23px; height: 23px; flex: 0 0 23px; place-items: center; border: 1px solid rgba(225,77,97,.4); border-radius: 50%; background: rgba(151,34,52,.2); content: "+"; font-size: 16px; line-height: 1; }
         .refund-request-details[open] summary::before { content: "−"; }
@@ -55,7 +57,7 @@
         .refund-request-help { margin: -4px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
         .refund-submit-button { justify-self: start; min-height: 40px; padding: 0 16px; border: 1px solid rgba(255,140,155,.45); border-radius: 6px; color: #fff; background: linear-gradient(110deg, #842d40, #a1384c); box-shadow: 0 4px 14px rgba(151,34,52,.2); font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; transition: filter .2s, transform .2s, box-shadow .2s; }
         .refund-submit-button:hover { filter: brightness(1.12); box-shadow: 0 6px 18px rgba(151,34,52,.32); transform: translateY(-1px); }
-        .refund-request-status { display: grid; flex: 1 0 100%; width: 100%; gap: 5px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: rgba(255,255,255,.025); font-size: 10px; overflow-wrap: anywhere; }
+        .refund-request-status { display: grid; grid-column: 1 / -1; width: 100%; min-width: 0; gap: 5px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: rgba(255,255,255,.025); font-size: 10px; overflow-wrap: anywhere; }
         .refund-request-status strong { color: #e8c35f; }
         .refund-request-status.status-approved strong, .refund-request-status.status-refunded strong { color: #60d9a1; }
         .refund-request-status.status-rejected strong { color: #ff7888; }
@@ -63,8 +65,6 @@
         .refund-evidence-list a { color: #c4b1ff; text-decoration: underline; }
         .refund-errors { margin: 0 0 14px; padding: 10px 12px; border: 1px solid rgba(225,77,97,.35); border-radius: 7px; color: #ff9aa6; background: rgba(151,34,52,.12); font-size: 11px; }
         @media (max-width: 800px) {
-            .order-footer { flex-wrap: wrap; align-items: stretch; }
-            .order-footer > .delivery-info, .order-footer > .order-totals { flex: 1 1 100%; width: 100%; min-width: 0; margin-left: 0; }
             .refund-submit-button { width: 100%; }
         }
     </style>

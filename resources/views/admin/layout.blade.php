@@ -136,6 +136,8 @@
             .topbar { min-height: 50px; gap: 8px; }
             .topbar-search { width: min(190px, 52vw); }
             .admin-profile-copy { display: none; }
+            .notification-menu { position: fixed; top: 58px; right: 12px; width: min(330px, calc(100vw - 86px)); max-height: 45vh; display: flex; flex-direction: column; }
+            .notification-list { min-height: 0; max-height: none; flex: 1 1 auto; overflow-y: auto; }
             .page-heading { align-items: center; }
             .page-heading h1 { font-size: 17px; }
             .page-heading p { max-width: 210px; line-height: 1.5; }

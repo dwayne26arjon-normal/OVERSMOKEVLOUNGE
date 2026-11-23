@@ -202,7 +202,7 @@
                                         </div>
                                     @endif
                                 </div>
-                            @elseif ($order->status !== 'cancelled')
+                            @elseif ($order->status === 'completed')
                                 <details class="refund-request-details" @if ((int) old('refund_order_id') === $order->id) open @endif>
                                     <summary>Request a refund</summary>
                                     <form class="refund-request-form" method="POST" action="{{ route('orders.refunds.store', $order) }}" enctype="multipart/form-data">

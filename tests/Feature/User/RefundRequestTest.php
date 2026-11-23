@@ -79,11 +79,13 @@ class RefundRequestTest extends TestCase
             ->assertSessionHasErrors('order');
     }
 
-    public function test_customer_cannot_request_refund_for_another_customers_or_cancelled_order(): void
+    public function test_customer_cannot_request_refund_for_another_customers_or_incomplete_orders(): void
     {
         $customer = User::factory()->create();
         $otherCustomer = User::factory()->create();
-        $otherOrder = $this->createOrder($otherCustomer);
+        $otherOrder = $this->createOrder($otherCustomer, 'completed');
+        $processingOrder = $this->createOrder($customer, 'processing');
+        $shippedOrder = $this->createOrder($customer, 'shipped');
         $cancelledOrder = $this->createOrder($customer, 'cancelled');
 
         $this->actingAs($customer, 'web')
@@ -92,28 +94,34 @@ class RefundRequestTest extends TestCase
             ])
             ->assertNotFound();
 
-        $this->actingAs($customer, 'web')
-            ->from(route('orders'))
-            ->post(route('orders.refunds.store', $cancelledOrder), [
-                'description' => 'The item arrived damaged.',
-            ])
-            ->assertRedirect(route('orders'))
-            ->assertSessionHasErrors('refund_request');
+        foreach ([$processingOrder, $shippedOrder, $cancelledOrder] as $incompleteOrder) {
+            $this->actingAs($customer, 'web')
+                ->from(route('orders'))
+                ->post(route('orders.refunds.store', $incompleteOrder), [
+                    'description' => 'The item arrived damaged.',
+                ])
+                ->assertRedirect(route('orders'))
+                ->assertSessionHasErrors('refund_request');
+        }
 
         $this->assertDatabaseCount('refund_requests', 0);
     }
 
-    public function test_orders_page_offers_the_form_only_for_non_cancelled_orders_without_a_request(): void
+    public function test_orders_page_offers_the_form_only_for_completed_orders_without_a_request(): void
     {
         $customer = User::factory()->create();
-        $processingOrder = $this->createOrder($customer);
+        $processingOrder = $this->createOrder($customer, 'processing');
+        $shippedOrder = $this->createOrder($customer, 'shipped');
+        $completedOrder = $this->createOrder($customer, 'completed');
         $cancelledOrder = $this->createOrder($customer, 'cancelled');
 
         $this->actingAs($customer, 'web')
             ->get(route('orders'))
             ->assertOk()
             ->assertSee('Request a refund')
-            ->assertSee(route('orders.refunds.store', $processingOrder), false)
+            ->assertSee(route('orders.refunds.store', $completedOrder), false)
+            ->assertDontSee(route('orders.refunds.store', $processingOrder), false)
+            ->assertDontSee(route('orders.refunds.store', $shippedOrder), false)
             ->assertDontSee(route('orders.refunds.store', $cancelledOrder), false)
             ->assertSee('enctype="multipart/form-data"', false)
             ->assertSee('data-refund-preview', false)
@@ -123,7 +131,7 @@ class RefundRequestTest extends TestCase
     public function test_customer_cannot_submit_unsupported_evidence(): void
     {
         $customer = User::factory()->create();
-        $order = $this->createOrder($customer);
+        $order = $this->createOrder($customer, 'completed');
 
         $this->actingAs($customer, 'web')
             ->from(route('orders'))
@@ -137,7 +145,7 @@ class RefundRequestTest extends TestCase
         $this->assertDatabaseCount('refund_requests', 0);
     }
 
-    private function createOrder(User $customer, string $status = 'processing'): Order
+    private function createOrder(User $customer, string $status = 'completed'): Order
     {
         return Order::create([
             'user_id' => $customer->id,

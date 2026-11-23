@@ -32,9 +32,9 @@ class RefundRequestController extends Controller
                     ->lockForUpdate()
                     ->findOrFail($order);
 
-                if ($customerOrder->status === 'cancelled') {
+                if ($customerOrder->status !== 'completed') {
                     throw ValidationException::withMessages([
-                        'refund_request' => ['A refund request cannot be made for a cancelled order.'],
+                        'refund_request' => ['A refund request can only be made after delivery is completed.'],
                     ]);
                 }
 

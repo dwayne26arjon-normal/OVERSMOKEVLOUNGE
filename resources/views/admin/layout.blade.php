@@ -162,6 +162,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/products.png') }}" alt=""><span class="nav-text">Products</span></a>
                 <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/inventory.png') }}" alt=""><span class="nav-text">Inventory</span></a>
                 <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/orders.png') }}" alt=""><span class="nav-text">Orders</span></a>
+                <a class="nav-link {{ request()->routeIs('admin.refunds.*') ? 'active' : '' }}" href="{{ route('admin.refunds.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4.9 9a7.5 7.5 0 0 1 12.4-2.8L20 9"/><path d="M4 17v-5h5"/><path d="M19.1 15a7.5 7.5 0 0 1-12.4 2.8L4 15"/></svg><span class="nav-text">Refund requests</span></a>
                 @if (auth('admin')->user()->is_admin)
                     <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c0-4 2.8-6.5 7-6.5s7 2.5 7 6.5"/></svg><span class="nav-text">Staff</span></a>
                 @endif
@@ -174,9 +175,9 @@
 
         <div class="main-area">
             <header class="topbar">
-                <form class="topbar-search" method="GET" action="{{ request()->routeIs('admin.orders.*') ? route('admin.orders.index') : route('admin.products.index') }}" role="search">
-                    <label class="sr-only" for="admin-search">Search {{ request()->routeIs('admin.orders.*') ? 'orders' : 'products' }}</label>
-                    <input id="admin-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search {{ request()->routeIs('admin.orders.*') ? 'orders...' : 'products...' }}">
+                <form class="topbar-search" method="GET" action="{{ request()->routeIs('admin.refunds.*') ? route('admin.refunds.index') : (request()->routeIs('admin.orders.*') ? route('admin.orders.index') : route('admin.products.index')) }}" role="search">
+                    <label class="sr-only" for="admin-search">Search {{ request()->routeIs('admin.refunds.*') ? 'refund requests' : (request()->routeIs('admin.orders.*') ? 'orders' : 'products') }}</label>
+                    <input id="admin-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search {{ request()->routeIs('admin.refunds.*') ? 'refund requests...' : (request()->routeIs('admin.orders.*') ? 'orders...' : 'products...') }}">
                     <span class="search-icon" aria-hidden="true">⌕</span>
                 </form>
                 <div class="admin-notifications"

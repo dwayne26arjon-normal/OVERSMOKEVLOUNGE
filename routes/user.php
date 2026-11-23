@@ -36,6 +36,7 @@ Route::view('/terms-and-conditions', 'user.legal', [
             'paragraphs' => [
                 'Product listings, prices, and stock are subject to change. An order is subject to product availability and confirmation by the store. If an item is unavailable or an order cannot be fulfilled, the store will contact you using the details provided with your account or order.',
                 'The checkout currently offers cash on delivery only; this site does not process online payments. Delivery arrangements and order updates use the contact and address details you provide.',
+                'Signed-in customers may submit one damage-related refund request for each non-cancelled order, with a description and optional image or video evidence. Store staff review requests and decide the refund amount. Any refund payment is arranged by the store outside this website; the site only records the decision and manual completion.',
             ],
         ],
         [
@@ -60,7 +61,7 @@ Route::view('/privacy-policy', 'user.legal', [
         [
             'heading' => 'Information we collect',
             'paragraphs' => [
-                'When you use the store, we collect the information you provide, such as your name, email address, and password. If you save profile or checkout details or place an order, we also process the phone number, delivery address, items, and order details you provide.',
+                'When you use the store, we collect the information you provide, such as your name, email address, and password. If you save profile or checkout details or place an order, we also process the phone number, delivery address, items, and order details you provide. If you request a refund, we also process your damage description and any photos or videos you attach.',
                 'Passwords are stored as hashes rather than readable text. The checkout currently accepts cash on delivery and does not collect online payment card details.',
             ],
         ],
@@ -73,8 +74,8 @@ Route::view('/privacy-policy', 'user.legal', [
         [
             'heading' => 'Sharing and storage',
             'paragraphs' => [
-                'Information may be processed by service providers needed to host, secure, or operate the store, and may be disclosed when required by law.',
-                'We retain information for as long as needed to provide the service, manage orders, and meet applicable legal or operational requirements. Reasonable safeguards are used to protect information, but no online service can guarantee absolute security.',
+                'Information may be processed by service providers needed to host, secure, or operate the store, and may be disclosed when required by law. Refund evidence is stored privately and can be accessed by the customer who submitted it and authorized store staff reviewing the request.',
+                'We retain information for as long as needed to provide the service, manage orders and refund requests, and meet applicable legal or operational requirements. Reasonable safeguards are used to protect information, but no online service can guarantee absolute security.',
             ],
         ],
         [
@@ -154,6 +155,8 @@ Route::middleware(['auth:web', 'customer'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->whereNumber('order')->name('orders.cancel');
+    Route::post('/orders/{order}/refund-requests', [\App\Http\Controllers\User\RefundRequestController::class, 'store'])->whereNumber('order')->name('orders.refunds.store');
+    Route::get('/refund-evidence/{evidence}/download', [\App\Http\Controllers\User\RefundRequestController::class, 'downloadEvidence'])->whereNumber('evidence')->name('refund-evidence.download');
 });
 
 Route::middleware(['auth:web', 'customer'])->group(function () {

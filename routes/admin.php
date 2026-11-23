@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminPasswordResetController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\RefundRequestController;
 use App\Http\Controllers\Admin\AdminStaffController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
         Route::get('/orders/{order}/invoice', [AdminOrderController::class, 'printInvoice'])->name('orders.invoice');
         Route::post('/orders/{order}/invoice/email', [AdminOrderController::class, 'emailInvoice'])->name('orders.invoice.email');
+        Route::get('/refund-requests', [RefundRequestController::class, 'index'])->name('refunds.index');
+        Route::get('/refund-requests/{refundRequest}', [RefundRequestController::class, 'show'])->name('refunds.show');
+        Route::patch('/refund-requests/{refundRequest}', [RefundRequestController::class, 'update'])->name('refunds.update');
+        Route::get('/refund-evidence/{evidence}/download', [RefundRequestController::class, 'downloadEvidence'])->whereNumber('evidence')->name('refund-evidence.download');
         Route::get('/products', [AdminProductController::class, 'products'])->name('products.index');
         Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
         Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');

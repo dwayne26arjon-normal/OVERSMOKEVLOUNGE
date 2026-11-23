@@ -26,7 +26,7 @@ class OrderController extends Controller
         return view('user.orders', [
             'orders' => Order::query()
                 ->where('user_id', $request->user()->id)
-                ->with('items')
+                ->with(['items', 'refundRequest.evidences'])
                 ->latest()
                 ->get(),
         ]);
@@ -55,6 +55,12 @@ class OrderController extends Controller
             if ($lockedOrder->status !== 'processing') {
                 throw ValidationException::withMessages([
                     'order' => ['Only processing orders can be cancelled.'],
+                ]);
+            }
+
+            if ($lockedOrder->refundRequest()->exists()) {
+                throw ValidationException::withMessages([
+                    'order' => ['An order with a refund request cannot be cancelled online.'],
                 ]);
             }
 

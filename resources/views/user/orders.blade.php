@@ -34,6 +34,22 @@
         .order-cancel-keep { color: var(--text); background: rgba(255,255,255,.04); }
         .order-cancel-confirm { border-color: rgba(225,77,97,.5) !important; color: #fff; background: #9c3043; }
         .order-cancel-actions button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; }
+        .refund-request-details { width: 100%; padding-top: 12px; border-top: 1px solid var(--line); }
+        .refund-request-details summary { color: #ffb1b8; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .refund-request-form { display: grid; gap: 9px; max-width: 520px; margin-top: 12px; }
+        .refund-request-form label { color: var(--muted); font-size: 10px; }
+        .refund-request-form textarea, .refund-request-form input[type="file"] { width: 100%; padding: 9px; border: 1px solid var(--line); border-radius: 6px; background: #11111b; color: var(--text); font: inherit; font-size: 11px; }
+        .refund-request-form textarea { min-height: 90px; resize: vertical; }
+        .refund-request-help { margin: -4px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
+        .refund-submit-button { justify-self: start; min-height: 36px; padding: 0 13px; border: 1px solid rgba(225,77,97,.4); border-radius: 6px; color: #fff; background: #8d293a; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .refund-submit-button:hover { background: #a83246; }
+        .refund-request-status { display: grid; width: 100%; gap: 5px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+        .refund-request-status strong { color: #e8c35f; }
+        .refund-request-status.status-approved strong, .refund-request-status.status-refunded strong { color: #60d9a1; }
+        .refund-request-status.status-rejected strong { color: #ff7888; }
+        .refund-evidence-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .refund-evidence-list a { color: #c4b1ff; text-decoration: underline; }
+        .refund-errors { margin: 0 0 14px; padding: 10px 12px; border: 1px solid rgba(225,77,97,.35); border-radius: 7px; color: #ff9aa6; background: rgba(151,34,52,.12); font-size: 11px; }
     </style>
 </head>
 <body
@@ -73,6 +89,13 @@
         </div>
         @if (session('status'))
             <p class="order-page-status" role="status">{{ session('status') }}</p>
+        @endif
+        @if ($errors->any())
+            <div class="refund-errors" role="alert">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
         @endif
 
         @if ($orders->isEmpty())
@@ -137,10 +160,46 @@
                                 <div><dt>Shipping fee</dt><dd>₱{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                                 <div class="grand-total"><dt>Total</dt><dd>₱{{ number_format((float) $order->total, 2) }}</dd></div>
                             </dl>
-                            <form class="order-cancel-form" data-order-cancel method="POST" action="{{ route('orders.cancel', $order) }}" @if ($order->status !== 'processing') hidden @endif>
+                            <form class="order-cancel-form" data-order-cancel method="POST" action="{{ route('orders.cancel', $order) }}" @if ($order->status !== 'processing' || $order->refundRequest) hidden @endif>
                                 @csrf
                                 <button class="order-cancel-button" type="submit">Cancel order</button>
                             </form>
+                            @if ($order->refundRequest)
+                                <div class="refund-request-status status-{{ $order->refundRequest->status }}" aria-label="Refund request status">
+                                    <span>Refund request: <strong>{{ ucfirst($order->refundRequest->status) }}</strong></span>
+                                    @if ($order->refundRequest->approved_amount)
+                                        <span>Approved amount: ₱{{ number_format((float) $order->refundRequest->approved_amount, 2) }}</span>
+                                    @endif
+                                    <span>{{ $order->refundRequest->description }}</span>
+                                    @if ($order->refundRequest->admin_note)
+                                        <span>Store response: {{ $order->refundRequest->admin_note }}</span>
+                                    @endif
+                                    @if ($order->refundRequest->status === 'refunded' && $order->refundRequest->completed_at)
+                                        <span>The store recorded the manual refund as completed {{ $order->refundRequest->completed_at->timezone(config('app.timezone'))->format('M j, Y · g:i A') }}. No payment is processed by this website.</span>
+                                    @endif
+                                    @if ($order->refundRequest->evidences->isNotEmpty())
+                                        <div class="refund-evidence-list">
+                                            @foreach ($order->refundRequest->evidences as $evidence)
+                                                <a href="{{ route('refund-evidence.download', $evidence) }}">Download evidence {{ $loop->iteration }}</a>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif ($order->status !== 'cancelled')
+                                <details class="refund-request-details" @if ((int) old('refund_order_id') === $order->id) open @endif>
+                                    <summary>Request a refund</summary>
+                                    <form class="refund-request-form" method="POST" action="{{ route('orders.refunds.store', $order) }}" enctype="multipart/form-data">
+                                        @csrf
+                                        <input type="hidden" name="refund_order_id" value="{{ $order->id }}">
+                                        <label for="refund-description-{{ $order->id }}">Describe the damage and identify the affected item(s)</label>
+                                        <textarea id="refund-description-{{ $order->id }}" name="description" maxlength="2000" required placeholder="Tell us what arrived damaged and which item was affected.">{{ (int) old('refund_order_id') === $order->id ? old('description') : '' }}</textarea>
+                                        <label for="refund-attachments-{{ $order->id }}">Photos or video (optional)</label>
+                                        <input id="refund-attachments-{{ $order->id }}" type="file" name="attachments[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple>
+                                        <p class="refund-request-help">Up to 3 files; JPG, PNG, WebP, MP4, MOV, or WebM, up to 12 MB each. Attachments are private and visible only to you and store staff. One request per order.</p>
+                                        <button class="refund-submit-button" type="submit">Submit refund request</button>
+                                    </form>
+                                </details>
+                            @endif
                         </footer>
                     </article>
                 @endforeach

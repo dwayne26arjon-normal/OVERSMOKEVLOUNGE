@@ -10,9 +10,7 @@ class CustomerPasswordResetCode extends Notification
 {
     use Queueable;
 
-    public function __construct(public readonly string $code)
-    {
-    }
+    public function __construct(public readonly string $code) {}
 
     public function via(object $notifiable): array
     {
@@ -23,10 +21,12 @@ class CustomerPasswordResetCode extends Notification
     {
         return (new MailMessage)
             ->subject('Your Oversmoke Vlounge password reset code')
-            ->greeting('Password reset requested')
-            ->line('Enter this verification code to reset your customer account password:')
-            ->line($this->code)
-            ->line('This code expires in 10 minutes and can only be used once.')
-            ->line('If you did not request a password reset, you can ignore this email.');
+            ->view([
+                'html' => 'emails.password-reset-code',
+                'text' => 'emails.text.password-reset-code',
+            ], [
+                'accountType' => 'customer',
+                'code' => $this->code,
+            ]);
     }
 }

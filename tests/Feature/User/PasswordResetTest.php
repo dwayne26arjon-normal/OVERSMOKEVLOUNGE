@@ -3,13 +3,14 @@
 namespace Tests\Feature\User;
 
 use App\Models\User;
+use App\Notifications\AdminPasswordResetCode;
 use App\Notifications\CustomerPasswordResetCode;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\DB;
 use Mockery;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
@@ -39,6 +40,21 @@ class PasswordResetTest extends TestCase
             ->assertSessionHas('status');
 
         Notification::assertSentTo($customer, CustomerPasswordResetCode::class);
+    }
+
+    public function test_customer_and_admin_reset_emails_include_the_store_logo(): void
+    {
+        foreach ([
+            new CustomerPasswordResetCode('123456'),
+            new AdminPasswordResetCode('654321'),
+        ] as $notification) {
+            $message = $notification->toMail(new User);
+            $this->assertSame('emails.password-reset-code', $message->view['html']);
+            $this->assertSame('emails.text.password-reset-code', $message->view['text']);
+
+            $html = view($message->view['html'], $message->viewData)->render();
+            $this->assertStringContainsString(asset('images/oversmokev-logo.png'), $html);
+        }
     }
 
     public function test_customer_repeating_a_reset_request_is_redirected_to_code_entry(): void

@@ -21,10 +21,12 @@ class AdminPasswordResetCode extends Notification
     {
         return (new MailMessage)
             ->subject('Your Oversmoke Vlounge admin password reset code')
-            ->greeting('Admin password reset requested')
-            ->line('Enter this verification code to reset your store account password:')
-            ->line($this->code)
-            ->line('This code expires in 10 minutes and can only be used once.')
-            ->line('If you did not request a reset, you can ignore this email.');
+            ->view([
+                'html' => 'emails.password-reset-code',
+                'text' => 'emails.text.password-reset-code',
+            ], [
+                'accountType' => 'owner or staff',
+                'code' => $this->code,
+            ]);
     }
 }

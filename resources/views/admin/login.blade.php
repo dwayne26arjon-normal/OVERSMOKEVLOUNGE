@@ -92,7 +92,7 @@
         .field { margin-bottom: 19px; animation: content-enter .6s .24s both; }
         .field:nth-of-type(2) { animation-delay: .34s; }
         label { display: block; margin-bottom: 8px; color: #e8e4f1; font-size: 13px; font-weight: 500; }
-        input[type="email"], input[type="password"] {
+        input[type="email"], .password-field input {
             width: 100%;
             height: 48px;
             padding: 0 14px;
@@ -105,8 +105,16 @@
             font-size: 14px;
             transition: border-color .2s, box-shadow .2s, background-color .2s, transform .2s;
         }
-        input[type="email"]:hover, input[type="password"]:hover { border-color: #51416f; }
-        input[type="email"]:focus, input[type="password"]:focus { transform: translateY(-1px); border-color: #8357ff; outline: none; background: #15121e; box-shadow: 0 0 0 3px rgba(112, 69, 235, .2), 0 0 22px rgba(112, 69, 235, .12); }
+        input[type="email"]:hover, .password-field input:hover { border-color: #51416f; }
+        input[type="email"]:focus, .password-field input:focus { transform: translateY(-1px); border-color: #8357ff; outline: none; background: #15121e; box-shadow: 0 0 0 3px rgba(112, 69, 235, .2), 0 0 22px rgba(112, 69, 235, .12); }
+        .password-field { position: relative; }
+        .password-field input { padding-right: 50px; }
+        .password-toggle { position: absolute; top: 50%; right: 8px; display: grid; width: 34px; height: 34px; place-items: center; padding: 6px; border: 0; border-radius: 5px; background: transparent; color: #aaa4b2; cursor: pointer; transform: translateY(-50%); }
+        .password-toggle:hover, .password-toggle:focus-visible { background: #211b2c; color: #fff; }
+        .password-toggle:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 1px; }
+        .password-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+        .password-eye-closed, .password-toggle[aria-pressed="true"] .password-eye-open { display: none; }
+        .password-toggle[aria-pressed="true"] .password-eye-closed { display: block; }
         .remember { display: inline-flex; align-items: center; gap: 9px; color: #bdb8c9; font-size: 12px; cursor: pointer; animation: content-enter .6s .42s both; }
         .remember input { width: 15px; height: 15px; margin: 0; accent-color: #7045eb; }
         .error { margin: 7px 0 0; color: #ff8e9b; font-size: 12px; }
@@ -236,13 +244,19 @@
 
             <div class="field">
                 <label for="password">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    autocomplete="current-password"
-                    required
-                >
+                <div class="password-field">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button class="password-toggle" type="button" data-password-toggle aria-controls="password" aria-label="Show password" aria-pressed="false">
+                        <svg class="password-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="password-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.2A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7s-3.5 7-10 7c-1.4 0-2.7-.3-3.8-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
+                </div>
                 @error('password')
                     <p class="error">{{ $message }}</p>
                 @enderror
@@ -263,5 +277,16 @@
         @endif
         <p class="secure-note">Authorized administrators only</p>
     </main>
+    <script>
+        document.querySelectorAll('[data-password-toggle]').forEach(button => {
+            const input = document.getElementById(button.getAttribute('aria-controls'));
+            button.addEventListener('click', () => {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                button.setAttribute('aria-pressed', String(show));
+                button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            });
+        });
+    </script>
 </body>
 </html>

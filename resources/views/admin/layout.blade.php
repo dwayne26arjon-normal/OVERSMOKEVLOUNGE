@@ -138,9 +138,10 @@
             .admin-profile-copy { display: none; }
             .notification-menu { position: fixed; top: 58px; right: 12px; width: min(330px, calc(100vw - 86px)); max-height: 45vh; display: flex; flex-direction: column; }
             .notification-list { min-height: 0; max-height: none; flex: 1 1 auto; overflow-y: auto; }
-            .page-heading { align-items: center; }
+            .page-heading { align-items: center; flex-wrap: wrap; }
             .page-heading h1 { font-size: 17px; }
             .page-heading p { max-width: 210px; line-height: 1.5; }
+            .page-heading > .primary-button, .dashboard-heading-actions > .primary-button { flex-shrink: 0; white-space: nowrap; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

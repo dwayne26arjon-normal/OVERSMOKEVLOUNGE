@@ -75,7 +75,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="pagination">
+            <div class="pagination pagination-scroll">
                 <span>Showing {{ $requests->firstItem() }}-{{ $requests->lastItem() }} of {{ $requests->total() }} requests</span>
                 @if ($requests->hasPages())
                     {{ $requests->links() }}

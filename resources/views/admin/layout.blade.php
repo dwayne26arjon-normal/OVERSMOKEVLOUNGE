@@ -117,6 +117,13 @@
         .empty-state { padding: 38px 16px; color: #888291; font-size: 11px; text-align: center; }
         .pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #26212f; padding: 11px 12px; color: #888291; font-size: 9px; }
         .pagination nav { display: flex; flex: 0 0 auto; justify-content: flex-end; }
+        .pagination-scroll { min-width: 0; }
+        .pagination-scroll > span { flex: 0 0 auto; white-space: nowrap; }
+        .pagination-scroll nav { flex: 1 1 auto; min-width: 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-behavior: smooth; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+        .pagination-scroll nav > div:nth-child(2), .pagination-scroll nav > div:nth-child(2) > div:last-child { min-width: max-content; }
+        .pagination-scroll nav > div:nth-child(2) > div:last-child > span { flex-wrap: nowrap; width: max-content; }
+        .pagination-scroll nav::-webkit-scrollbar { height: 4px; }
+        .pagination-scroll nav::-webkit-scrollbar-thumb { border-radius: 999px; background: #57477f; }
         .pagination nav > div:first-child, .pagination nav > div:nth-child(2) > div:first-child { display: none; }
         .pagination nav > div:nth-child(2), .pagination nav > div:nth-child(2) > div:last-child { display: flex; align-items: center; justify-content: flex-end; }
         .pagination nav > div:nth-child(2) > div:last-child > span { display: flex; align-items: center; gap: 4px; }

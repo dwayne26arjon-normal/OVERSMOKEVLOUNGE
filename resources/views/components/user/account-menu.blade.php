@@ -47,5 +47,33 @@
     @endauth
 </div>
 @auth('web')
+    <div
+        class="user-support-chat"
+        data-user-support-chat
+        data-endpoint="{{ route('support-chat.index') }}"
+        data-send-url="{{ route('support-chat.messages.store') }}"
+        data-csrf-token="{{ csrf_token() }}"
+    >
+        <button class="support-chat-launcher" type="button" data-chat-toggle aria-expanded="false" aria-controls="userSupportChatPanel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.5-3A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11h7M8.5 14h4"/></svg>
+            <span>Support chat</span>
+        </button>
+        <section class="support-chat-panel" id="userSupportChatPanel" aria-label="Support chat" hidden>
+            <header class="support-chat-header">
+                <div><strong>Support chat</strong><span>Chat with our store team</span></div>
+                <button class="support-chat-close" type="button" data-chat-close aria-label="Close support chat">×</button>
+            </header>
+            <div class="support-chat-messages" data-chat-messages role="log" aria-live="polite" aria-relevant="additions text">
+                <p class="support-chat-empty">Send a message to start a conversation.</p>
+            </div>
+            <p class="support-chat-status" data-chat-status role="status" aria-live="polite"></p>
+            <form class="support-chat-form" data-chat-form>
+                <label class="support-chat-sr-only" for="userSupportChatMessage">Your message</label>
+                <textarea id="userSupportChatMessage" data-chat-input rows="2" maxlength="2000" placeholder="Write a message..." required></textarea>
+                <button type="submit" data-chat-send>Send</button>
+            </form>
+        </section>
+    </div>
     <script defer src="{{ asset('js/user-notifications.js') }}?v={{ filemtime(public_path('js/user-notifications.js')) }}"></script>
+    <script defer src="{{ asset('js/user-support-chat.js') }}?v={{ filemtime(public_path('js/user-support-chat.js')) }}"></script>
 @endauth

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\User\NotificationController;
+use App\Http\Controllers\User\SupportChatController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Models\Product;
@@ -147,6 +148,8 @@ Route::get('/products/{id}', function (int $id) {
 Route::view('/cart', 'user.cart')->middleware(['auth:web', 'customer'])->name('cart');
 Route::view('/checkout', 'user.checkout')->middleware(['auth:web', 'customer'])->name('checkout');
 Route::middleware(['auth:web', 'customer'])->group(function () {
+    Route::get('/support-chat', [SupportChatController::class, 'index'])->name('support-chat.index');
+    Route::post('/support-chat/messages', [SupportChatController::class, 'store'])->middleware('throttle:30,1')->name('support-chat.messages.store');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('user.notifications.index');
     Route::patch('/notifications/settings', [NotificationController::class, 'updateSettings'])->name('user.notifications.settings');
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('user.notifications.read-all');

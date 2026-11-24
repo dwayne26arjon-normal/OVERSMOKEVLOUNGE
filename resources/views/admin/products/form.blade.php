@@ -49,7 +49,7 @@
             <section class="panel form-panel">
                 <div class="form-panel-heading">
                     <h2 class="panel-title">Featured promotional image</h2>
-                    <p class="panel-subtitle">Optional carousel artwork. A wide 3:1 image (1200 × 400 px recommended) fits best and is displayed without cropping. This does not replace the catalog photo.</p>
+                    <p class="panel-subtitle">Optional carousel artwork. The carousel frame adapts to show the full image without cropping. Wide 3:1 artwork (1200 × 400 px recommended) works best. This does not replace the catalog photo.</p>
                 </div>
                 <label class="image-drop" for="featured_image">
                     @if ($product->featured_image_path)

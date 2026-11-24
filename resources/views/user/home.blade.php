@@ -99,11 +99,11 @@
             </div>
             @if ($featuredProducts->isNotEmpty())
                 <div class="banner-featured" aria-label="Featured products">
-                    <div class="featured-carousel" data-featured-carousel role="region" aria-roledescription="carousel" aria-label="Featured products">
+                    <div class="featured-carousel{{ $featuredProducts->count() > 1 ? ' has-controls' : '' }}" data-featured-carousel role="region" aria-roledescription="carousel" aria-label="Featured products">
                         <div class="featured-carousel-track" aria-live="polite">
                             @foreach ($featuredProducts as $featuredProduct)
                                 <article class="featured-slide{{ $loop->first ? ' is-active' : '' }}" data-featured-slide aria-roledescription="slide" aria-label="{{ $loop->iteration }} of {{ $featuredProducts->count() }}" @if (!$loop->first) hidden @endif>
-                                    <a class="featured-product-image" href="{{ route('products.show', $featuredProduct->id) }}" aria-label="View {{ $featuredProduct->name }}">
+                                    <a class="featured-product-image{{ $featuredProduct->featured_image_path || $featuredProduct->image_path ? '' : ' is-placeholder' }}" href="{{ route('products.show', $featuredProduct->id) }}" aria-label="View {{ $featuredProduct->name }}">
                                         @if ($featuredProduct->featured_image_path || $featuredProduct->image_path)
                                             <img class="{{ $featuredProduct->featured_image_path ? 'featured-artwork' : '' }}" src="{{ asset('storage/' . ($featuredProduct->featured_image_path ?: $featuredProduct->image_path)) }}" alt="{{ $featuredProduct->name }}">
                                         @else

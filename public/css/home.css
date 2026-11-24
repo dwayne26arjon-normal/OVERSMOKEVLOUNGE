@@ -110,7 +110,7 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 
 /* ---------- Banner ---------- */
 .banner { flex-shrink: 0; position: relative; overflow: hidden;
-          height: clamp(240px, 36vh, 380px);
+          height: auto; min-height: clamp(240px, 36vh, 380px);
           background: linear-gradient(120deg, #1a0f3d 0%, #3b1fa8 55%, #1b0f45 100%) center / cover no-repeat;
           display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 24px 48px;
           border-bottom: 1px solid var(--line); animation: fadeUp .9s .25s ease both; }
@@ -136,9 +136,10 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .banner .shop:hover::after { left: 130%; transition: left .6s ease; }
 @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(79,31,240,.6); } 50% { box-shadow: 0 0 22px 6px rgba(79,31,240,.45); } }
 .banner-featured { position: relative; z-index: 2; display: flex; flex: 0 1 58%; align-self: stretch; min-width: 0; max-width: none; }
-.featured-carousel { position: relative; width: 100%; height: 100%; min-height: 0; padding: 8px 48px 34px 0; }
-.featured-carousel-track { height: 100%; min-height: 0; }
-.featured-slide { position: relative; display: block; height: 100%; min-height: 0; }
+.featured-carousel { position: relative; width: 100%; height: auto; min-height: 0; padding: 8px 0 0; }
+.featured-carousel.has-controls { padding-bottom: 34px; }
+.featured-carousel-track { height: auto; min-height: 0; }
+.featured-slide { position: relative; display: block; height: auto; min-height: 0; }
 .featured-slide[hidden] { display: none; }
 .featured-slide.is-active { animation: featuredEnter .45s ease both; }
 .featured-slide.is-active.slide-next { animation-name: featuredEnterFromRight; }
@@ -147,11 +148,13 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 @keyframes featuredEnterFromRight { from { opacity: 0; translate: 36px 0; scale: .98; } to { opacity: 1; translate: 0 0; scale: 1; } }
 @keyframes featuredEnterFromLeft { from { opacity: 0; translate: -36px 0; scale: .98; } to { opacity: 1; translate: 0 0; scale: 1; } }
 .featured-slide::before { position: absolute; top: 4%; right: 2%; bottom: 4%; width: 66%; border-radius: 50%; background: radial-gradient(ellipse, rgba(125,82,255,.48), rgba(59,76,210,.22) 46%, transparent 74%); content: ""; filter: blur(24px); pointer-events: none; }
-.featured-product-image { position: absolute; top: 50%; right: 0; z-index: 1; display: flex; width: 100%; max-width: none; aspect-ratio: 3 / 1; align-items: center; justify-content: center; overflow: hidden; padding: 7px; border: 1px solid rgba(220,205,255,.62); border-radius: 20px; background: linear-gradient(145deg, rgba(14,12,32,.94), rgba(50,25,104,.86) 48%, rgba(19,38,92,.88)); box-shadow: 0 18px 40px rgba(0,0,0,.4), 0 0 28px rgba(130,92,255,.4), inset 0 1px rgba(255,255,255,.42); transform: translateY(-50%); }
+.featured-product-image { position: relative; z-index: 1; display: flex; width: 100%; max-width: none; align-items: center; justify-content: center; overflow: hidden; padding: 0; border: 1px solid rgba(220,205,255,.62); border-radius: 20px; background: linear-gradient(145deg, rgba(14,12,32,.94), rgba(50,25,104,.86) 48%, rgba(19,38,92,.88)); box-shadow: 0 18px 40px rgba(0,0,0,.4), 0 0 28px rgba(130,92,255,.4), inset 0 1px rgba(255,255,255,.42); }
+.featured-product-image.is-placeholder { aspect-ratio: 3 / 1; }
 .featured-product-image::before { position: absolute; inset: -35%; background: conic-gradient(from 25deg, transparent, rgba(196,181,253,.28), transparent 28%, rgba(65,150,255,.24), transparent 58%); content: ""; animation: featuredOrbit 16s linear infinite; }
 .featured-product-image::after { position: absolute; inset: 7px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; background: linear-gradient(135deg, rgba(255,255,255,.12), transparent 35%); content: ""; pointer-events: none; }
 @keyframes featuredOrbit { to { rotate: 360deg; } }
-.featured-product-image img, .featured-product-image .banner-featured-cutout { position: relative; z-index: 1; display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 13px; object-fit: contain; object-position: center; filter: drop-shadow(0 8px 12px rgba(0,0,0,.4)); animation: featuredFloat 4.2s ease-in-out infinite; }
+.featured-product-image img { position: relative; z-index: 1; display: block; width: 100%; height: auto; max-width: 100%; max-height: 360px; border-radius: 18px; object-fit: contain; object-position: center; filter: drop-shadow(0 8px 12px rgba(0,0,0,.4)); animation: featuredFloat 4.2s ease-in-out infinite; }
+.featured-product-image .banner-featured-cutout { position: relative; z-index: 1; display: block; max-width: 100%; border-radius: 13px; filter: drop-shadow(0 8px 12px rgba(0,0,0,.4)); animation: featuredFloat 4.2s ease-in-out infinite; }
 @keyframes featuredFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -7px; } }
 .banner-featured-placeholder { width: 42px; height: 110px; border: 2px solid rgba(255,255,255,.3); border-radius: 12px 12px 18px 18px; background: linear-gradient(110deg, #313242, #12121b 44%, #59566c 70%, #15141f); box-shadow: 0 18px 30px rgba(0,0,0,.35); }
 .featured-carousel-controls { position: absolute; right: 0; bottom: 0; display: flex; align-items: center; gap: 8px; }
@@ -275,8 +278,6 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
     .search { margin-left: 0; flex-basis: 260px; }
     .banner { gap: 18px; padding-right: 28px; padding-left: 28px; }
     .banner-featured { flex-basis: 50%; }
-    .featured-carousel { padding-right: 36px; }
-    .featured-product-image { width: min(100%, 500px); }
 }
 
 @media (max-width: 700px) {
@@ -296,9 +297,10 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
     .banner h2 { font-size: clamp(34px, 9vw, 48px); }
     .banner p { max-width: 280px; margin: 2px 0 8px; font-size: 12px; }
     .banner .shop { padding: 7px 14px; font-size: 12px; }
-    .banner-featured { width: 100%; max-width: none; min-height: 160px; flex: 0 0 160px; }
-    .featured-carousel { padding: 0 38px 32px 0; }
-    .featured-product-image { top: 50%; right: 4px; width: min(100%, 420px); }
+    .banner-featured { width: 100%; max-width: none; min-height: 0; flex: 0 0 auto; }
+    .featured-carousel { padding: 0; }
+    .featured-carousel.has-controls { padding-bottom: 32px; }
+    .featured-product-image img { max-height: 220px; }
     .content { padding: 0 16px 30px; }
     .grid { gap: 12px; }
     .card .img { height: 145px; }
@@ -318,9 +320,7 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
     .grid.list .card .img { width: 100%; height: 160px; }
     .grid.list .info { border-left: 0; border-top: 1px solid var(--line); }
     .banner { padding: 12px 16px; }
-    .banner-featured { min-height: 148px; flex-basis: 148px; }
-    .featured-carousel { padding-right: 34px; }
-    .featured-product-image { width: min(100%, 320px); border-radius: 15px; }
+    .featured-product-image { border-radius: 15px; }
     .toolbar { gap: 8px; }
     .sort { max-width: calc(100% - 88px); padding: 9px 10px; font-size: 11px; }
     .view-btn { flex: 0 0 34px; width: 34px; height: 34px; }

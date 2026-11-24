@@ -28,6 +28,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/support-chat/conversations', [SupportChatController::class, 'conversations'])->name('support-chat.conversations');
         Route::get('/support-chat/conversations/{conversation}', [SupportChatController::class, 'messages'])->name('support-chat.messages');
         Route::post('/support-chat/conversations/{conversation}/messages', [SupportChatController::class, 'store'])->middleware('throttle:30,1')->name('support-chat.messages.store');
+        Route::delete('/support-chat/conversations/{conversation}', [SupportChatController::class, 'destroyConversation'])->name('support-chat.conversations.destroy');
         Route::get('/orders/notifications', [AdminOrderController::class, 'notifications'])->name('orders.notifications');
         Route::patch('/orders/notifications/read-all', [AdminOrderController::class, 'markAllNotificationsRead'])->name('orders.notifications.read-all');
         Route::patch('/orders/notifications/{notification}/read', [AdminOrderController::class, 'markNotificationRead'])->name('orders.notifications.read');

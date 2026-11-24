@@ -113,4 +113,17 @@ class SupportChatController extends Controller
             ],
         ], 201)->header('Cache-Control', 'no-store');
     }
+
+    public function destroyConversation(SupportChatConversation $conversation): JsonResponse
+    {
+        DB::transaction(function () use ($conversation): void {
+            SupportChatConversation::query()
+                ->lockForUpdate()
+                ->findOrFail($conversation->id)
+                ->delete();
+        });
+
+        return response()->json(['deleted' => true])
+            ->header('Cache-Control', 'no-store');
+    }
 }

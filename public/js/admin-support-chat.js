@@ -9,6 +9,7 @@
     const form = root.querySelector('[data-chat-form]');
     const input = root.querySelector('[data-chat-input]');
     const sendButton = root.querySelector('[data-chat-send]');
+    const deleteButton = root.querySelector('[data-chat-delete]');
     const csrfToken = root.dataset.csrfToken;
     let conversations = [];
     let selectedConversationId = null;
@@ -21,7 +22,7 @@
             headers: {
                 Accept: 'application/json',
                 ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-                ...(options.method === 'POST' ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+                ...(['POST', 'DELETE'].includes(options.method) ? { 'X-CSRF-TOKEN': csrfToken } : {}),
                 ...options.headers
             },
             credentials: 'same-origin',
@@ -137,12 +138,14 @@
                 empty.textContent = 'Customer messages will appear here.';
                 messages.replaceChildren(empty);
                 form.hidden = true;
+                deleteButton.hidden = true;
                 return;
             }
 
             const selected = conversations.find(item => String(item.id) === String(selectedConversationId));
             conversationTitle.textContent = selected ? selected.customer : 'Support conversation';
             form.hidden = false;
+            deleteButton.hidden = false;
             const url = root.dataset.messagesUrlTemplate.replace('__CONVERSATION_ID__', encodeURIComponent(selectedConversationId));
             const messagePayload = await request(url);
             renderMessages(messagePayload.messages || []);
@@ -178,6 +181,26 @@
             status.textContent = 'Your message could not be sent. Please try again.';
         } finally {
             sendButton.disabled = false;
+        }
+    });
+
+    deleteButton.addEventListener('click', async () => {
+        if (!selectedConversationId || deleteButton.disabled) return;
+        if (!window.confirm('Delete this conversation and all its messages? This cannot be undone.')) return;
+
+        deleteButton.disabled = true;
+        status.textContent = '';
+        try {
+            const url = root.dataset.deleteUrlTemplate.replace('__CONVERSATION_ID__', encodeURIComponent(selectedConversationId));
+            await request(url, { method: 'DELETE' });
+            selectedConversationId = null;
+            lastMessageId = null;
+            await refresh();
+        } catch (error) {
+            console.error('Unable to delete support conversation.', error);
+            status.textContent = 'The conversation could not be deleted. Please try again.';
+        } finally {
+            deleteButton.disabled = false;
         }
     });
 

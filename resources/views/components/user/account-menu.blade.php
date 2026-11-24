@@ -54,6 +54,7 @@
         data-endpoint="{{ route('support-chat.index') }}"
         data-unread-count-url="{{ route('support-chat.unread-count') }}"
         data-send-url="{{ route('support-chat.messages.store') }}"
+        data-delete-url-template="{{ route('support-chat.messages.destroy', ['message' => '__MESSAGE_ID__']) }}"
         data-csrf-token="{{ csrf_token() }}"
     >
         <button class="support-chat-launcher" type="button" data-chat-toggle aria-expanded="false" aria-controls="userSupportChatPanel">

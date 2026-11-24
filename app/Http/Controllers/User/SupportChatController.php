@@ -91,4 +91,20 @@ class SupportChatController extends Controller
             ],
         ], 201)->header('Cache-Control', 'no-store');
     }
+
+    public function destroyMessage(Request $request, int $message): JsonResponse
+    {
+        $user = $request->user('web');
+        $conversation = $user->supportConversation()->firstOrFail();
+
+        $deletedMessage = $conversation->messages()
+            ->whereKey($message)
+            ->where('sender_id', $user->id)
+            ->where('sender_role', 'customer')
+            ->firstOrFail();
+        $deletedMessage->delete();
+
+        return response()->json(['deleted' => true])
+            ->header('Cache-Control', 'no-store');
+    }
 }

@@ -69,7 +69,7 @@
             headers: {
                 Accept: 'application/json',
                 ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-                ...(options.method === 'POST' ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+                ...(['POST', 'DELETE'].includes(options.method) ? { 'X-CSRF-TOKEN': csrfToken } : {}),
                 ...options.headers
             },
             credentials: 'same-origin',
@@ -103,6 +103,40 @@
             time.dateTime = item.created_at;
             time.textContent = item.created_at ? new Date(item.created_at).toLocaleString() : '';
             bubble.append(sender, text, time);
+
+            if (item.is_mine && item.sender_role === 'customer') {
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'support-chat-delete-message';
+                deleteButton.textContent = 'Delete';
+                deleteButton.setAttribute('aria-label', 'Delete this message');
+                deleteButton.addEventListener('click', async () => {
+                    if (deleteButton.disabled || !window.confirm('Delete this message?')) return;
+
+                    deleteButton.disabled = true;
+                    status.textContent = '';
+                    try {
+                        const url = root.dataset.deleteUrlTemplate.replace('__MESSAGE_ID__', encodeURIComponent(item.id));
+                        await request(url, { method: 'DELETE' });
+                        bubble.remove();
+                        lastMessageId = null;
+                        if (!messages.querySelector('.support-chat-bubble')) {
+                            const empty = document.createElement('p');
+                            empty.className = 'support-chat-empty';
+                            empty.textContent = 'Send a message to start a conversation.';
+                            messages.append(empty);
+                        }
+                        await refresh();
+                    } catch (error) {
+                        console.error('Unable to delete support chat message.', error);
+                        status.textContent = 'The message could not be deleted. Please try again.';
+                    } finally {
+                        deleteButton.disabled = false;
+                    }
+                });
+                bubble.append(deleteButton);
+            }
+
             messages.append(bubble);
         });
 

@@ -60,7 +60,7 @@
                     </thead>
                     <tbody>
                     @foreach ($requests as $refundRequest)
-                        <tr>
+                        <tr class="{{ $refundRequest->status === 'pending' ? 'refund-row-needs-review' : '' }}">
                             <td><a class="refund-order-link" href="{{ route('admin.orders.show', $refundRequest->order) }}">{{ $refundRequest->order->order_number }}</a></td>
                             <td>
                                 <span class="refund-customer-name">{{ $refundRequest->customer->name }}</span>
@@ -69,7 +69,11 @@
                             <td>{{ $refundRequest->created_at->timezone(config('app.timezone'))->format('M j, Y · g:i A') }}</td>
                             <td>{{ $refundRequest->approved_amount ? '₱'.number_format((float) $refundRequest->approved_amount, 2) : 'Pending decision' }}</td>
                             <td><span class="refund-status status-{{ $refundRequest->status }}">{{ ucfirst($refundRequest->status) }}</span></td>
-                            <td><a class="table-action" href="{{ route('admin.refunds.show', $refundRequest) }}">Review</a></td>
+                            <td>
+                                <a class="table-action {{ $refundRequest->status === 'pending' ? 'refund-review-action' : '' }}" href="{{ route('admin.refunds.show', $refundRequest) }}">
+                                    {{ $refundRequest->status === 'pending' ? 'Review now' : 'Review' }}
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -108,6 +112,10 @@
         .refund-customer-email { margin-top: 3px; color: #797382; font-size: 9px; }
         .refund-status { display: inline-flex; min-height: 19px; align-items: center; padding: 0 7px; border: 1px solid #312943; border-radius: 4px; background: #1c1725; color: #c4b1ff; font-size: 9px; }
         .refund-status.status-pending { border-color: rgba(212,160,45,.28); background: rgba(160,117,18,.1); color: #e8c35f; }
+        .refund-row-needs-review td { background: rgba(160,117,18,.055); }
+        .refund-row-needs-review td:first-child { box-shadow: inset 3px 0 #c9972e; }
+        .refund-review-action { display: inline-flex; min-height: 23px; align-items: center; padding: 0 8px; border: 1px solid rgba(212,160,45,.32); border-radius: 4px; background: rgba(160,117,18,.12); color: #e8c35f; }
+        .refund-review-action:hover { border-color: rgba(232,195,95,.65); background: rgba(160,117,18,.22); color: #ffe295; }
         .refund-status.status-approved, .refund-status.status-refunded { border-color: rgba(48,180,122,.24); background: rgba(28,125,81,.1); color: #60d9a1; }
         .refund-status.status-rejected { border-color: rgba(225,77,97,.27); background: rgba(151,34,52,.12); color: #ff7888; }
         @media (max-width: 760px) { .refund-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

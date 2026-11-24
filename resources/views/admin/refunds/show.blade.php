@@ -20,6 +20,21 @@
         </div>
     @endif
 
+    @if ($refundRequest->status === 'pending')
+        <aside class="refund-review-checklist" data-refund-review-checklist aria-labelledby="refund-review-checklist-title">
+            <span class="refund-review-checklist-icon" aria-hidden="true">!</span>
+            <div>
+                <h2 id="refund-review-checklist-title">Before deciding, check these items</h2>
+                <ul>
+                    <li>Compare the customer's description with the order and items.</li>
+                    <li>Inspect the attached damage photos or videos.</li>
+                    <li>Verify the e-wallet QR code if using it for the refund payment.</li>
+                    <li>Keep the approved amount within the order total. Payment must be sent manually after approval.</li>
+                </ul>
+            </div>
+        </aside>
+    @endif
+
     <div class="refund-detail-grid">
         <section class="panel refund-detail-card">
             <h2>Customer and order</h2>
@@ -148,6 +163,10 @@
         .refund-status.status-rejected { border-color: rgba(225,77,97,.4); background: rgba(151,34,52,.16); color: #ff7888; }
         .refund-error { margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(225,77,97,.3); border-radius: 6px; color: #ff9aa7; background: rgba(151,34,52,.12); font-size: 10px; }
         .refund-error p { margin: 0; }
+        .refund-review-checklist { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; padding: 14px; border: 1px solid rgba(212,160,45,.38); border-left: 3px solid #d4a02d; border-radius: 7px; background: linear-gradient(110deg, rgba(160,117,18,.14), rgba(160,117,18,.045)); }
+        .refund-review-checklist-icon { display: grid; width: 25px; height: 25px; flex: 0 0 25px; place-items: center; border: 1px solid rgba(232,195,95,.4); border-radius: 50%; color: #e8c35f; background: rgba(160,117,18,.18); font-size: 13px; font-weight: 700; }
+        .refund-review-checklist h2 { margin: 0 0 7px; color: #f0d788; font: 600 12px 'Outfit', sans-serif; }
+        .refund-review-checklist ul { display: grid; gap: 4px; margin: 0; padding-left: 16px; color: #c9c1ad; font-size: 10px; line-height: 1.5; }
         .refund-detail-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 12px; }
         .refund-detail-card, .refund-review-card { min-width: 0; padding: 16px; }
         .refund-detail-card h2, .refund-review-card h2 { margin: 0 0 13px; font: 600 13px 'Outfit', sans-serif; }

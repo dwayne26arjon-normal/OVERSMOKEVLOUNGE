@@ -409,9 +409,7 @@
     right: 20px;
     bottom: 20px;
     z-index: 70;
-    display: grid;
-    justify-items: end;
-    gap: 10px;
+    display: block;
     color: #eeeaf5;
     font-family: inherit;
 }
@@ -469,8 +467,10 @@
 }
 
 .support-chat-panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
     display: grid;
-    order: 1;
     width: min(360px, calc(100vw - 28px));
     height: min(480px, calc(100dvh - 100px));
     grid-template-rows: auto minmax(0, 1fr) auto auto;
@@ -485,8 +485,9 @@
     display: none;
 }
 
-.support-chat-launcher {
-    order: 2;
+.support-chat-panel.is-below {
+    top: calc(100% + 10px);
+    bottom: auto;
 }
 
 .support-chat-header {

@@ -114,18 +114,27 @@
         }
     }
 
-    function setOpen(open) {
+    function positionPanel() {
+        const rootBounds = root.getBoundingClientRect();
+        const panelBounds = panel.getBoundingClientRect();
+        const maxLeft = window.innerWidth - panelBounds.width - 8;
+        const panelLeft = Math.max(8, Math.min(rootBounds.right - panelBounds.width, maxLeft));
+
+        panel.style.left = `${panelLeft - rootBounds.left}px`;
+        panel.style.right = 'auto';
+        panel.classList.toggle('is-below', rootBounds.top < panelBounds.height + 20);
+    }
+
+    function setOpen(open, focusInput = false) {
         panel.hidden = !open;
         toggle.setAttribute('aria-expanded', String(open));
         if (open) {
-            window.requestAnimationFrame(() => {
-                if (root.style.left) setPosition(root.getBoundingClientRect().left, root.getBoundingClientRect().top);
-            });
+            window.requestAnimationFrame(positionPanel);
             refresh().catch(error => {
                 console.error('Unable to load support chat.', error);
                 status.textContent = 'Messages could not be loaded. Please try again.';
             });
-            input.focus();
+            if (focusInput) input.focus();
         } else {
             toggle.focus();
         }
@@ -153,6 +162,7 @@
 
         activePointer.moved = true;
         setPosition(activePointer.left + deltaX, activePointer.top + deltaY);
+        if (!panel.hidden) positionPanel();
     });
 
     toggle.addEventListener('pointerup', event => {
@@ -174,7 +184,7 @@
             event.preventDefault();
             return;
         }
-        setOpen(panel.hidden);
+        setOpen(panel.hidden, event.detail === 0);
     });
 
     closeButton.addEventListener('click', () => setOpen(false));
@@ -218,5 +228,6 @@
     });
     window.addEventListener('resize', () => {
         if (root.style.left) setPosition(root.getBoundingClientRect().left, root.getBoundingClientRect().top);
+        if (!panel.hidden) positionPanel();
     });
 })();

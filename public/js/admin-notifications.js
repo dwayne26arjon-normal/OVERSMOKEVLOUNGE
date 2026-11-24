@@ -10,8 +10,8 @@
     const markAllButton = document.getElementById('markAllNotificationsRead');
     const ordersBadge = document.querySelector('[data-admin-orders-unread-count]');
     const refundsBadge = document.querySelector('[data-admin-refunds-unread-count]');
-    const ordersLink = ordersBadge.closest('a');
-    const refundsLink = refundsBadge.closest('a');
+    const ordersLink = ordersBadge ? ordersBadge.closest('a') : null;
+    const refundsLink = refundsBadge ? refundsBadge.closest('a') : null;
     const csrfToken = root.dataset.csrfToken;
     let knownIds = new Set();
     let initialized = false;
@@ -19,6 +19,8 @@
     let toastTimer;
 
     function renderSidebarBadge(badge, link, value, label) {
+        if (!badge || !link) return;
+
         const unreadCount = Math.max(0, Number(value) || 0);
         badge.hidden = unreadCount === 0;
         badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);

@@ -29,23 +29,19 @@ class AdminOrderController extends Controller
     public function notifications(Request $request): JsonResponse
     {
         $admin = $request->user('admin');
-        $unreadCounts = $admin->unreadNotifications()
+        $unreadCount = $admin->unreadNotifications()
             ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
-            ->selectRaw('type, COUNT(*) as total')
-            ->groupBy('type')
-            ->pluck('total', 'type');
+            ->count();
         $notifications = $admin->notifications()
             ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
             ->latest()
             ->limit(30)
             ->get();
-        $unreadOrderCount = (int) $unreadCounts->get(NewOrderReceived::class, 0);
-        $unreadRefundRequestCount = (int) $unreadCounts->get(RefundRequestSubmitted::class, 0);
         $processingOrderCount = Order::query()->where('status', 'processing')->count();
         $pendingRefundRequestCount = RefundRequest::query()->where('status', 'pending')->count();
 
         return response()->json([
-            'unread_count' => $unreadOrderCount + $unreadRefundRequestCount,
+            'unread_count' => $unreadCount,
             'processing_orders_count' => $processingOrderCount,
             'pending_refund_requests_count' => $pendingRefundRequestCount,
             'notifications' => $notifications->map(function ($notification) {

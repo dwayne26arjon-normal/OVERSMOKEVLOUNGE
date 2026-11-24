@@ -141,7 +141,8 @@
     function refreshWithErrorHandling() {
         refreshNotifications().catch(error => {
             console.error('Unable to load admin notifications.', error);
-            status.textContent = 'Notifications could not be loaded. Please try again.';
+            const details = error instanceof Error ? error.message : 'Unexpected response.';
+            status.textContent = `Notifications could not be loaded: ${details}`;
         });
     }
 

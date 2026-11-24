@@ -132,7 +132,7 @@ Route::get('/welcome', function () {
 Route::get('/home', function () {
     return view('user.home', [
         'products' => Product::query()->where('is_active', true)->orderByDesc('is_featured')->latest()->get(),
-        'featuredProducts' => Product::query()->where('is_active', true)->where('is_featured', true)->latest()->limit(2)->get(),
+        'featuredProducts' => Product::query()->where('is_active', true)->where('is_featured', true)->latest()->get(),
         'categories' => Product::query()->where('is_active', true)->whereNotNull('category')->where('category', '!=', '')->distinct()->orderBy('category')->pluck('category'),
         'brands' => Product::query()->where('is_active', true)->whereNotNull('brand')->where('brand', '!=', '')->distinct()->orderBy('brand')->pluck('brand'),
         'maximumPrice' => max(5000, (float) Product::query()->where('is_active', true)->max('price')),

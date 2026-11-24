@@ -78,6 +78,36 @@ class PublicBrowsingTest extends TestCase
             ->assertSee('featured-label">Featured', false);
     }
 
+    public function test_home_carousel_includes_all_active_featured_products(): void
+    {
+        foreach (range(1, 4) as $number) {
+            Product::create([
+                'name' => "Featured Product {$number}",
+                'category' => 'Devices',
+                'price' => 1000 + $number * 100,
+                'stock' => 5,
+                'is_active' => true,
+                'is_featured' => true,
+            ]);
+        }
+
+        Product::create([
+            'name' => 'Inactive Featured Product',
+            'category' => 'Devices',
+            'price' => 2000,
+            'stock' => 5,
+            'is_active' => false,
+            'is_featured' => true,
+        ]);
+
+        $response = $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('data-featured-dot="3"', false)
+            ->assertDontSee('Inactive Featured Product');
+
+        $this->assertSame(4, substr_count($response->getContent(), 'data-featured-slide'));
+    }
+
     public function test_home_feature_cards_use_the_supplied_icon_images(): void
     {
         $this->get(route('home'))

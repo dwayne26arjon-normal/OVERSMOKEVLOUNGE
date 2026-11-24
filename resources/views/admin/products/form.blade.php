@@ -49,14 +49,14 @@
             <section class="panel form-panel">
                 <div class="form-panel-heading">
                     <h2 class="panel-title">Featured promotional image</h2>
-                    <p class="panel-subtitle">Optional artwork for the featured carousel. This does not replace the catalog photo.</p>
+                    <p class="panel-subtitle">Optional carousel artwork. A wide 3:1 image (1200 × 400 px recommended) fits best and is displayed without cropping. This does not replace the catalog photo.</p>
                 </div>
                 <label class="image-drop" for="featured_image">
                     @if ($product->featured_image_path)
                         <img id="featured-image-preview" src="{{ asset('storage/' . $product->featured_image_path) }}" alt="Current featured promotional image">
                     @else
                         <img id="featured-image-preview" alt="Featured promotional image preview" hidden>
-                        <span class="image-placeholder" id="featured-image-placeholder"><span class="upload-icon">+</span><strong>Choose promotional artwork</strong><span>Square or landscape artwork works best</span></span>
+                        <span class="image-placeholder" id="featured-image-placeholder"><span class="upload-icon">+</span><strong>Choose promotional artwork</strong><span>Use wide 3:1 artwork for the best fit</span></span>
                     @endif
                     <input type="file" id="featured_image" name="featured_image" accept="image/*">
                 </label>

@@ -18,6 +18,17 @@ class SupportChatController extends Controller
         return view('admin.support-chat.index');
     }
 
+    public function unreadCount(): JsonResponse
+    {
+        $unreadCount = SupportChatMessage::query()
+            ->where('sender_role', 'customer')
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json(['unread_count' => $unreadCount])
+            ->header('Cache-Control', 'no-store');
+    }
+
     public function conversations(): JsonResponse
     {
         $conversations = SupportChatConversation::query()

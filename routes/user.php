@@ -149,6 +149,7 @@ Route::view('/cart', 'user.cart')->middleware(['auth:web', 'customer'])->name('c
 Route::view('/checkout', 'user.checkout')->middleware(['auth:web', 'customer'])->name('checkout');
 Route::middleware(['auth:web', 'customer'])->group(function () {
     Route::get('/support-chat', [SupportChatController::class, 'index'])->name('support-chat.index');
+    Route::get('/support-chat/unread-count', [SupportChatController::class, 'unreadCount'])->name('support-chat.unread-count');
     Route::post('/support-chat/messages', [SupportChatController::class, 'store'])->middleware('throttle:30,1')->name('support-chat.messages.store');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('user.notifications.index');
     Route::patch('/notifications/settings', [NotificationController::class, 'updateSettings'])->name('user.notifications.settings');

@@ -427,6 +427,7 @@
 }
 
 .support-chat-launcher {
+    position: relative;
     display: inline-flex;
     min-height: 46px;
     align-items: center;
@@ -442,6 +443,28 @@
     font-weight: 600;
     cursor: pointer;
     touch-action: none;
+}
+
+.support-chat-unread-count {
+    position: absolute;
+    top: -7px;
+    right: -5px;
+    display: grid;
+    min-width: 19px;
+    height: 19px;
+    place-items: center;
+    padding: 0 5px;
+    border: 2px solid #111019;
+    border-radius: 999px;
+    background: #e74d70;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.support-chat-unread-count[hidden] {
+    display: none;
 }
 
 .support-chat-launcher:hover,

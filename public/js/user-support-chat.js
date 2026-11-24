@@ -5,6 +5,7 @@
     document.body.append(root);
 
     const toggle = root.querySelector('[data-chat-toggle]');
+    const unreadBadge = root.querySelector('[data-chat-unread-count]');
     const closeButton = root.querySelector('[data-chat-close]');
     const panel = root.querySelector('.support-chat-panel');
     const messages = root.querySelector('[data-chat-messages]');
@@ -18,6 +19,15 @@
     let lastMessageId = null;
     let activePointer = null;
     let suppressClick = false;
+
+    function setUnreadCount(value) {
+        const unreadCount = Math.max(0, Number(value) || 0);
+        unreadBadge.hidden = unreadCount === 0;
+        unreadBadge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+        toggle.setAttribute('aria-label', unreadCount > 0
+            ? `Support chat, ${unreadCount} unread messages`
+            : 'Support chat');
+    }
 
     function setPosition(left, top) {
         const bounds = root.getBoundingClientRect();
@@ -108,9 +118,21 @@
         try {
             const payload = await request(root.dataset.endpoint);
             renderMessages(payload.messages || []);
+            setUnreadCount(0);
             status.textContent = '';
         } finally {
             checking = false;
+        }
+    }
+
+    async function refreshUnreadCount() {
+        if (!panel.hidden || document.visibilityState !== 'visible') return;
+
+        try {
+            const payload = await request(root.dataset.unreadCountUrl);
+            setUnreadCount(payload.unread_count);
+        } catch (error) {
+            console.error('Unable to refresh support chat unread count.', error);
         }
     }
 
@@ -217,15 +239,20 @@
             console.error('Unable to refresh support chat.', error);
             status.textContent = 'Messages could not be refreshed.';
         });
+        refreshUnreadCount();
     }, 5000);
     document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && !panel.hidden) {
-            refresh().catch(error => {
-                console.error('Unable to refresh support chat.', error);
-                status.textContent = 'Messages could not be refreshed.';
-            });
+        if (document.visibilityState === 'visible') {
+            refreshUnreadCount();
+            if (!panel.hidden) {
+                refresh().catch(error => {
+                    console.error('Unable to refresh support chat.', error);
+                    status.textContent = 'Messages could not be refreshed.';
+                });
+            }
         }
     });
+    refreshUnreadCount();
     window.addEventListener('resize', () => {
         if (root.style.left) setPosition(root.getBoundingClientRect().left, root.getBoundingClientRect().top);
         if (!panel.hidden) positionPanel();

@@ -52,12 +52,14 @@
         data-user-support-chat
         data-user-id="{{ auth('web')->id() }}"
         data-endpoint="{{ route('support-chat.index') }}"
+        data-unread-count-url="{{ route('support-chat.unread-count') }}"
         data-send-url="{{ route('support-chat.messages.store') }}"
         data-csrf-token="{{ csrf_token() }}"
     >
         <button class="support-chat-launcher" type="button" data-chat-toggle aria-expanded="false" aria-controls="userSupportChatPanel">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.5-3A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11h7M8.5 14h4"/></svg>
             <span>Support chat</span>
+            <span class="support-chat-unread-count" data-chat-unread-count aria-live="polite" hidden></span>
         </button>
         <section class="support-chat-panel" id="userSupportChatPanel" aria-label="Support chat" hidden>
             <header class="support-chat-header">

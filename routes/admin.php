@@ -24,6 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', [AdminProductController::class, 'dashboard'])->name('dashboard');
         Route::get('/support-chat', [SupportChatController::class, 'index'])->name('support-chat.index');
+        Route::get('/support-chat/unread-count', [SupportChatController::class, 'unreadCount'])->name('support-chat.unread-count');
         Route::get('/support-chat/conversations', [SupportChatController::class, 'conversations'])->name('support-chat.conversations');
         Route::get('/support-chat/conversations/{conversation}', [SupportChatController::class, 'messages'])->name('support-chat.messages');
         Route::post('/support-chat/conversations/{conversation}/messages', [SupportChatController::class, 'store'])->middleware('throttle:30,1')->name('support-chat.messages.store');

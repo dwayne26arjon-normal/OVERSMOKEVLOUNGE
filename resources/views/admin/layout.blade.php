@@ -21,7 +21,7 @@
         .brand span { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
         .nav-label { margin: 28px 8px 9px; color: #686273; font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
         .nav-links { display: grid; gap: 4px; }
-        .nav-link { display: flex; min-height: 34px; align-items: center; gap: 10px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; color: #9c97a8; font-size: 11px; text-decoration: none; transition: background .18s, color .18s, border-color .18s; }
+        .nav-link { position: relative; display: flex; min-height: 34px; align-items: center; gap: 10px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; color: #9c97a8; font-size: 11px; text-decoration: none; transition: background .18s, color .18s, border-color .18s; }
         .nav-link:hover { background: #171320; color: #f4f1ff; }
         .nav-link.active { border-color: rgba(130, 88, 255, .16); background: linear-gradient(90deg, rgba(100, 54, 236, .28), rgba(90, 50, 180, .1)); color: #cdbdff; }
         .nav-icon { display: block; width: 16px; height: 16px; flex: 0 0 16px; object-fit: contain; opacity: .9; }
@@ -29,6 +29,8 @@
         .nav-link.active .nav-icon { opacity: 1; }
         .nav-link.disabled { color: #625d6b; cursor: not-allowed; }
         .nav-link.disabled .nav-icon { opacity: .45; }
+        .admin-chat-nav-count { position: absolute; top: -5px; right: -5px; display: grid; min-width: 17px; height: 17px; place-items: center; padding: 0 4px; border: 1px solid #0c0a12; border-radius: 999px; background: #e74d70; color: #fff; font-size: 9px; font-weight: 700; }
+        .admin-chat-nav-count[hidden] { display: none; }
         .sidebar-bottom { margin-top: auto; }
         .add-shortcut { display: flex; min-height: 32px; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid #32264d; border-radius: 6px; color: #c8b7ff; font-size: 10px; text-decoration: none; transition: background .18s; }
         .add-shortcut:hover { background: #1c1530; }
@@ -163,7 +165,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/inventory.png') }}" alt=""><span class="nav-text">Inventory</span></a>
                 <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><img class="nav-icon" src="{{ asset('images/admin-icons/orders.png') }}" alt=""><span class="nav-text">Orders</span></a>
                 <a class="nav-link {{ request()->routeIs('admin.refunds.*') ? 'active' : '' }}" href="{{ route('admin.refunds.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4.9 9a7.5 7.5 0 0 1 12.4-2.8L20 9"/><path d="M4 17v-5h5"/><path d="M19.1 15a7.5 7.5 0 0 1-12.4 2.8L4 15"/></svg><span class="nav-text">Refund requests</span></a>
-                <a class="nav-link {{ request()->routeIs('admin.support-chat.*') ? 'active' : '' }}" href="{{ route('admin.support-chat.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.5-3A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11h7M8.5 14h4"/></svg><span class="nav-text">Support chat</span></a>
+                <a class="nav-link {{ request()->routeIs('admin.support-chat.*') ? 'active' : '' }}" href="{{ route('admin.support-chat.index') }}" data-admin-chat-unread-url="{{ route('admin.support-chat.unread-count') }}" aria-label="Support chat"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.5-3A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11h7M8.5 14h4"/></svg><span class="nav-text">Support chat</span><span class="admin-chat-nav-count" data-admin-chat-unread-count aria-live="polite" hidden></span></a>
                 @if (auth('admin')->user()->is_admin)
                     <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c0-4 2.8-6.5 7-6.5s7 2.5 7 6.5"/></svg><span class="nav-text">Staff</span></a>
                 @endif
@@ -275,6 +277,7 @@
         })();
     </script>
     <script src="{{ asset('js/admin-notifications.js') }}?v={{ filemtime(public_path('js/admin-notifications.js')) }}"></script>
+    <script src="{{ asset('js/admin-support-chat-notifications.js') }}?v={{ filemtime(public_path('js/admin-support-chat-notifications.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

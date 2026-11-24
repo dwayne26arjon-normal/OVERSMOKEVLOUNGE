@@ -10,6 +10,20 @@ use Illuminate\Support\Facades\DB;
 
 class SupportChatController extends Controller
 {
+    public function unreadCount(Request $request): JsonResponse
+    {
+        $conversation = $request->user('web')->supportConversation()->first();
+        $unreadCount = $conversation
+            ? $conversation->messages()
+                ->whereIn('sender_role', ['admin', 'staff'])
+                ->whereNull('read_at')
+                ->count()
+            : 0;
+
+        return response()->json(['unread_count' => $unreadCount])
+            ->header('Cache-Control', 'no-store');
+    }
+
     public function index(Request $request): JsonResponse
     {
         $user = $request->user('web');

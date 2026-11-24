@@ -63,7 +63,11 @@
         .admin-chat-thread-messages { display: flex; min-height: 320px; max-height: 580px; flex-direction: column; gap: 10px; overflow-y: auto; padding: 16px; }
         .admin-chat-bubble { display: grid; max-width: 82%; align-self: flex-start; gap: 5px; padding: 9px 11px; border: 1px solid #332d3f; border-radius: 10px 10px 10px 3px; color: #e7e2ee; background: #1b1823; }
         .admin-chat-bubble.is-mine { align-self: flex-end; border-color: rgba(130,98,220,.45); border-radius: 10px 10px 3px 10px; background: rgba(100,72,177,.25); }
+        .admin-chat-sender-line { display: flex; align-items: center; gap: 7px; }
         .admin-chat-bubble strong { color: #c9b8ff; font-size: 9px; }
+        .admin-chat-role { display: inline-flex; align-items: center; padding: 2px 6px; border: 1px solid transparent; border-radius: 999px; font-size: 8px; font-weight: 600; line-height: 1.2; }
+        .admin-chat-role.is-customer { border-color: rgba(113,169,255,.28); color: #a9cbff; background: rgba(70,119,197,.15); }
+        .admin-chat-role.is-support { border-color: rgba(177,145,255,.3); color: #d3c0ff; background: rgba(116,79,205,.18); }
         .admin-chat-bubble p { margin: 0; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
         .admin-chat-bubble time { color: #928b9c; font-size: 9px; }
         .admin-chat-status { margin: 0; padding: 0 12px; color: #ff9aa6; font-size: 10px; }

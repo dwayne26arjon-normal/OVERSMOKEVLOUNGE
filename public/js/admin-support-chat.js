@@ -96,12 +96,19 @@
 
             const sender = document.createElement('strong');
             sender.textContent = item.is_mine ? `You · ${item.sender_name}` : item.sender_name;
+            const role = document.createElement('span');
+            const isCustomer = item.sender_role === 'customer';
+            role.className = `admin-chat-role ${isCustomer ? 'is-customer' : 'is-support'}`;
+            role.textContent = isCustomer ? 'Customer' : 'Support';
+            const senderLine = document.createElement('div');
+            senderLine.className = 'admin-chat-sender-line';
+            senderLine.append(sender, role);
             const text = document.createElement('p');
             text.textContent = item.message;
             const time = document.createElement('time');
             time.dateTime = item.created_at || '';
             time.textContent = item.created_at ? new Date(item.created_at).toLocaleString() : '';
-            bubble.append(sender, text, time);
+            bubble.append(senderLine, text, time);
             messages.append(bubble);
         });
 

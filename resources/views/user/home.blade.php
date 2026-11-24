@@ -192,7 +192,7 @@
                                 {{ $product->stock > 0 ? number_format($product->stock) . ' available' : 'Out of stock' }}
                             </p>
                             <div class="price">₱ {{ number_format((float) $product->price) }}</div>
-                            <a class="add" href="{{ route('products.show', $product->id) }}">🛒 View details</a>
+                            <a class="add" href="{{ route('products.show', $product->id) }}">View details</a>
                         </div>
                     </article>
                 @endforeach

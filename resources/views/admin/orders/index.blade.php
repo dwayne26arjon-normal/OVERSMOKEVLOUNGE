@@ -61,10 +61,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="pagination pagination-scroll">
+            <div class="pagination pagination-window">
                 <span>Showing {{ $orders->firstItem() }}-{{ $orders->lastItem() }} of {{ $orders->total() }} orders</span>
                 @if ($orders->hasPages())
-                    {{ $orders->links() }}
+                    {{ $orders->links('admin.pagination.scroll') }}
                 @endif
             </div>
         @endif

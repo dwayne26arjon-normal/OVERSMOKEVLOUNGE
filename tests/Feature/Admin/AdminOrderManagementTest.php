@@ -8,12 +8,24 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\NewOrderReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AdminOrderManagementTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_admin_pagination_renders_a_scrollable_page_number_window(): void
+    {
+        $paginator = new LengthAwarePaginator([], 100, 10, 7, ['path' => '/admin/orders']);
+        $html = view('admin.pagination.scroll', compact('paginator'))->render();
+
+        $this->assertStringContainsString('data-pagination-window', $html);
+        $this->assertStringContainsString('Go to page 1', $html);
+        $this->assertStringContainsString('Current page, 7', $html);
+        $this->assertStringContainsString('Go to page 10', $html);
+    }
 
     public function test_admin_can_view_order_list_details_and_printable_invoice(): void
     {

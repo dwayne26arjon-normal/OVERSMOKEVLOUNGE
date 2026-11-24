@@ -116,20 +116,27 @@
         .table-action:hover { color: #fff; }
         .empty-state { padding: 38px 16px; color: #888291; font-size: 11px; text-align: center; }
         .pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #26212f; padding: 11px 12px; color: #888291; font-size: 9px; }
-        .pagination nav { display: flex; flex: 0 0 auto; justify-content: flex-end; }
-        .pagination-scroll { min-width: 0; }
-        .pagination-scroll > span { flex: 0 0 auto; white-space: nowrap; }
-        .pagination-scroll nav { flex: 1 1 auto; min-width: 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-behavior: smooth; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
-        .pagination-scroll nav > div:nth-child(2), .pagination-scroll nav > div:nth-child(2) > div:last-child { min-width: max-content; }
-        .pagination-scroll nav > div:nth-child(2) > div:last-child > span { flex-wrap: nowrap; width: max-content; }
-        .pagination-scroll nav::-webkit-scrollbar { height: 4px; }
-        .pagination-scroll nav::-webkit-scrollbar-thumb { border-radius: 999px; background: #57477f; }
-        .pagination nav > div:first-child, .pagination nav > div:nth-child(2) > div:first-child { display: none; }
-        .pagination nav > div:nth-child(2), .pagination nav > div:nth-child(2) > div:last-child { display: flex; align-items: center; justify-content: flex-end; }
-        .pagination nav > div:nth-child(2) > div:last-child > span { display: flex; align-items: center; gap: 4px; }
-        .pagination a, .pagination span[aria-current] span, .pagination span[aria-disabled] span { display: inline-grid; min-width: 24px; height: 24px; place-items: center; border: 1px solid #302a3b; border-radius: 5px; color: #c3bdce; text-decoration: none; }
-        .pagination span[aria-current] span { border-color: #6543bb; background: #281e3d; color: #e1d7ff; }
-        .pagination span[aria-disabled] span { color: #615b6a; }
+        .pagination:not(.pagination-window) nav { display: flex; flex: 0 0 auto; justify-content: flex-end; }
+        .pagination:not(.pagination-window) nav > div:first-child, .pagination:not(.pagination-window) nav > div:nth-child(2) > div:first-child { display: none; }
+        .pagination:not(.pagination-window) nav > div:nth-child(2), .pagination:not(.pagination-window) nav > div:nth-child(2) > div:last-child { display: flex; align-items: center; justify-content: flex-end; }
+        .pagination:not(.pagination-window) nav > div:nth-child(2) > div:last-child > span { display: flex; align-items: center; gap: 4px; }
+        .pagination:not(.pagination-window) a, .pagination:not(.pagination-window) span[aria-current] span, .pagination:not(.pagination-window) span[aria-disabled] span { display: inline-grid; min-width: 24px; height: 24px; place-items: center; border: 1px solid #302a3b; border-radius: 5px; color: #c3bdce; text-decoration: none; }
+        .pagination:not(.pagination-window) span[aria-current] span { border-color: #6543bb; background: #281e3d; color: #e1d7ff; }
+        .pagination:not(.pagination-window) span[aria-disabled] span { color: #615b6a; }
+        .pagination-window { min-width: 0; }
+        .pagination-window > span { flex: 0 0 auto; white-space: nowrap; }
+        .admin-pagination { display: flex; flex: 0 1 auto; min-width: 0; align-items: center; justify-content: flex-end; gap: 5px; }
+        .admin-pagination-window { width: 174px; max-width: calc(100vw - 120px); flex: 0 1 174px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: x proximity; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+        .admin-pagination-track { display: flex; width: max-content; align-items: center; gap: 4px; padding: 1px 0; }
+        .admin-pagination-number, .admin-pagination-control { display: inline-grid; width: 24px; min-width: 24px; height: 24px; flex: 0 0 24px; place-items: center; border: 1px solid #302a3b; border-radius: 5px; color: #c3bdce; text-decoration: none; }
+        .admin-pagination-number { scroll-snap-align: center; }
+        .admin-pagination-number.is-current { border-color: #6543bb; background: #281e3d; color: #e1d7ff; }
+        .admin-pagination-control svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+        .admin-pagination-control.is-disabled { color: #615b6a; }
+        .admin-pagination a:hover, .admin-pagination a:focus-visible { border-color: #6543bb; background: #281e3d; color: #fff; outline: 0; }
+        .admin-pagination-window:focus-visible { border-radius: 5px; outline: 2px solid #a98cff; outline-offset: 2px; }
+        .admin-pagination-window::-webkit-scrollbar { height: 4px; }
+        .admin-pagination-window::-webkit-scrollbar-thumb { border-radius: 999px; background: #57477f; }
         @media (max-width: 760px) {
             .sidebar { width: 62px; align-items: center; padding: 14px 7px; }
             .brand { padding: 0; }
@@ -151,6 +158,14 @@
             .page-heading h1 { font-size: 17px; }
             .page-heading p { max-width: 210px; line-height: 1.5; }
             .page-heading > .primary-button, .dashboard-heading-actions > .primary-button { flex-shrink: 0; white-space: nowrap; }
+        }
+        @media (max-width: 600px) {
+            .pagination-window { flex-wrap: wrap; justify-content: center; }
+            .pagination-window > span { flex-basis: 100%; text-align: center; }
+            .pagination-window .admin-pagination { width: 100%; justify-content: center; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .admin-pagination-window { scroll-behavior: auto; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -283,6 +298,7 @@
             });
         })();
     </script>
+    <script src="{{ asset('js/admin-pagination.js') }}?v={{ filemtime(public_path('js/admin-pagination.js')) }}"></script>
     <script src="{{ asset('js/admin-notifications.js') }}?v={{ filemtime(public_path('js/admin-notifications.js')) }}"></script>
     <script src="{{ asset('js/admin-support-chat-notifications.js') }}?v={{ filemtime(public_path('js/admin-support-chat-notifications.js')) }}"></script>
     @stack('scripts')

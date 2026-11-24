@@ -75,10 +75,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="pagination pagination-scroll">
+            <div class="pagination pagination-window">
                 <span>Showing {{ $requests->firstItem() }}-{{ $requests->lastItem() }} of {{ $requests->total() }} requests</span>
                 @if ($requests->hasPages())
-                    {{ $requests->links() }}
+                    {{ $requests->links('admin.pagination.scroll') }}
                 @endif
             </div>
         @endif

@@ -174,7 +174,7 @@
                 </label>
                 <label class="active-toggle" for="is_featured">
                     <input type="checkbox" id="is_featured" name="is_featured" value="1" @checked($errors->any() ? old('is_featured') : ($product->exists && $product->is_featured))>
-                    <span><strong>Featured product</strong><small>Show this product first in the Featured storefront section.</small></span>
+                    <span><strong>Include in homepage carousel</strong><small>Every active product with this enabled gets a carousel slide. Add as many as you want; there is no fixed slide limit.</small></span>
                 </label>
                 <label class="active-toggle" for="is_hot">
                     <input type="checkbox" id="is_hot" name="is_hot" value="1" @checked($errors->any() ? old('is_hot') : ($product->exists && $product->is_hot))>

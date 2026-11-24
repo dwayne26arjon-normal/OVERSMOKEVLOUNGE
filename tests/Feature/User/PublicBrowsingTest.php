@@ -80,7 +80,7 @@ class PublicBrowsingTest extends TestCase
 
     public function test_home_carousel_includes_all_active_featured_products(): void
     {
-        foreach (range(1, 4) as $number) {
+        foreach (range(1, 12) as $number) {
             Product::create([
                 'name' => "Featured Product {$number}",
                 'category' => 'Devices',
@@ -102,10 +102,10 @@ class PublicBrowsingTest extends TestCase
 
         $response = $this->get(route('home'))
             ->assertOk()
-            ->assertSee('data-featured-dot="3"', false)
+            ->assertSee('data-featured-dot="11"', false)
             ->assertDontSee('Inactive Featured Product');
 
-        $this->assertSame(4, substr_count($response->getContent(), 'data-featured-slide'));
+        $this->assertSame(12, substr_count($response->getContent(), 'data-featured-slide'));
     }
 
     public function test_home_feature_cards_use_the_supplied_icon_images(): void

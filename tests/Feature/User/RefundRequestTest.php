@@ -89,6 +89,13 @@ class RefundRequestTest extends TestCase
             ->get(route('refund-evidence.download', $paymentQr))
             ->assertNotFound();
 
+        $missingEvidence = $refundRequest->evidences->first();
+        Storage::disk('local')->delete($missingEvidence->path);
+
+        $this->actingAs($customer, 'web')
+            ->get(route('refund-evidence.download', $missingEvidence))
+            ->assertNotFound();
+
         $this->actingAs($customer, 'web')
             ->get(route('orders'))
             ->assertOk()

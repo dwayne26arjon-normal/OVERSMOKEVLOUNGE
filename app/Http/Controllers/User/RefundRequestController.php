@@ -123,8 +123,17 @@ class RefundRequestController extends Controller
     private function download(RefundEvidence $evidence)
     {
         $extension = pathinfo($evidence->path, PATHINFO_EXTENSION);
+        $disk = Storage::disk($evidence->disk);
 
-        return Storage::disk($evidence->disk)->download(
+        if (! $disk->exists($evidence->path)) {
+            Log::warning('Refund evidence file is missing from storage.', [
+                'evidence_id' => $evidence->getKey(),
+            ]);
+
+            abort(404);
+        }
+
+        return $disk->download(
             $evidence->path,
             'refund-evidence-'.$evidence->id.($extension !== '' ? '.'.$extension : ''),
             [

@@ -50,6 +50,7 @@
     <div
         class="user-support-chat"
         data-user-support-chat
+        data-user-id="{{ auth('web')->id() }}"
         data-endpoint="{{ route('support-chat.index') }}"
         data-send-url="{{ route('support-chat.messages.store') }}"
         data-csrf-token="{{ csrf_token() }}"

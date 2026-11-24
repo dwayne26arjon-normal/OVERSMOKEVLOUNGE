@@ -2,6 +2,8 @@
     const root = document.querySelector('[data-user-support-chat]');
     if (!root) return;
 
+    document.body.append(root);
+
     const toggle = root.querySelector('[data-chat-toggle]');
     const closeButton = root.querySelector('[data-chat-close]');
     const panel = root.querySelector('.support-chat-panel');
@@ -11,8 +13,45 @@
     const input = root.querySelector('[data-chat-input]');
     const sendButton = root.querySelector('[data-chat-send]');
     const csrfToken = root.dataset.csrfToken;
+    const positionKey = `user-support-chat-position-${root.dataset.userId}`;
     let checking = false;
     let lastMessageId = null;
+    let activePointer = null;
+    let suppressClick = false;
+
+    function setPosition(left, top) {
+        const bounds = root.getBoundingClientRect();
+        const maxLeft = Math.max(8, window.innerWidth - bounds.width - 8);
+        const maxTop = Math.max(8, window.innerHeight - bounds.height - 8);
+        root.style.left = `${Math.max(8, Math.min(left, maxLeft))}px`;
+        root.style.top = `${Math.max(8, Math.min(top, maxTop))}px`;
+        root.style.right = 'auto';
+        root.style.bottom = 'auto';
+    }
+
+    function restorePosition() {
+        try {
+            const savedPosition = JSON.parse(window.localStorage.getItem(positionKey) || 'null');
+            if (savedPosition && Number.isFinite(savedPosition.left) && Number.isFinite(savedPosition.top)) {
+                setPosition(savedPosition.left, savedPosition.top);
+            }
+        } catch (error) {
+            console.warn('Unable to restore the support chat position.', error);
+        }
+    }
+
+    function savePosition() {
+        try {
+            window.localStorage.setItem(positionKey, JSON.stringify({
+                left: root.getBoundingClientRect().left,
+                top: root.getBoundingClientRect().top
+            }));
+        } catch (error) {
+            console.warn('Unable to save the support chat position.', error);
+        }
+    }
+
+    restorePosition();
 
     async function request(url, options = {}) {
         const response = await fetch(url, {
@@ -79,14 +118,65 @@
         panel.hidden = !open;
         toggle.setAttribute('aria-expanded', String(open));
         if (open) {
+            window.requestAnimationFrame(() => {
+                if (root.style.left) setPosition(root.getBoundingClientRect().left, root.getBoundingClientRect().top);
+            });
             refresh().catch(error => {
                 console.error('Unable to load support chat.', error);
                 status.textContent = 'Messages could not be loaded. Please try again.';
             });
+            input.focus();
+        } else {
+            toggle.focus();
         }
     }
 
-    toggle.addEventListener('click', () => setOpen(panel.hidden));
+    toggle.addEventListener('pointerdown', event => {
+        if (event.button !== 0 || !event.isPrimary) return;
+        const bounds = root.getBoundingClientRect();
+        activePointer = {
+            id: event.pointerId,
+            x: event.clientX,
+            y: event.clientY,
+            left: bounds.left,
+            top: bounds.top,
+            moved: false
+        };
+        toggle.setPointerCapture(event.pointerId);
+    });
+
+    toggle.addEventListener('pointermove', event => {
+        if (!activePointer || event.pointerId !== activePointer.id) return;
+        const deltaX = event.clientX - activePointer.x;
+        const deltaY = event.clientY - activePointer.y;
+        if (!activePointer.moved && Math.hypot(deltaX, deltaY) < 6) return;
+
+        activePointer.moved = true;
+        setPosition(activePointer.left + deltaX, activePointer.top + deltaY);
+    });
+
+    toggle.addEventListener('pointerup', event => {
+        if (!activePointer || event.pointerId !== activePointer.id) return;
+        if (activePointer.moved) {
+            suppressClick = true;
+            savePosition();
+        }
+        activePointer = null;
+    });
+
+    toggle.addEventListener('pointercancel', () => {
+        activePointer = null;
+    });
+
+    toggle.addEventListener('click', event => {
+        if (suppressClick) {
+            suppressClick = false;
+            event.preventDefault();
+            return;
+        }
+        setOpen(panel.hidden);
+    });
+
     closeButton.addEventListener('click', () => setOpen(false));
 
     form.addEventListener('submit', async event => {
@@ -125,5 +215,8 @@
                 status.textContent = 'Messages could not be refreshed.';
             });
         }
+    });
+    window.addEventListener('resize', () => {
+        if (root.style.left) setPosition(root.getBoundingClientRect().left, root.getBoundingClientRect().top);
     });
 })();

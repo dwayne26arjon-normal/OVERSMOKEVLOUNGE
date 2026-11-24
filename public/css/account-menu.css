@@ -443,6 +443,7 @@
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+    touch-action: none;
 }
 
 .support-chat-launcher:hover,
@@ -469,6 +470,7 @@
 
 .support-chat-panel {
     display: grid;
+    order: 1;
     width: min(360px, calc(100vw - 28px));
     height: min(480px, calc(100dvh - 100px));
     grid-template-rows: auto minmax(0, 1fr) auto auto;
@@ -481,6 +483,10 @@
 
 .support-chat-panel[hidden] {
     display: none;
+}
+
+.support-chat-launcher {
+    order: 2;
 }
 
 .support-chat-header {

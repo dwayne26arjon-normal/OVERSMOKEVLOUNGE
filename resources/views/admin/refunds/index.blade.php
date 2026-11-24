@@ -12,21 +12,45 @@
 
     <section class="refund-summary" aria-label="Refund request counts">
         @foreach (['pending' => 'Needs review', 'approved' => 'Approved', 'rejected' => 'Declined', 'refunded' => 'Completed'] as $key => $label)
-            <a class="refund-summary-card {{ request('status') === $key ? 'active' : '' }}" href="{{ route('admin.refunds.index', ['status' => $key]) }}">
+            <a class="refund-summary-card {{ request('status') === $key ? 'active' : '' }}" href="{{ route('admin.refunds.index', array_merge(request()->only(['date', 'q']), ['status' => $key])) }}">
                 <span>{{ $label }}</span>
                 <strong>{{ $counts->get($key, 0) }}</strong>
             </a>
         @endforeach
-        <a class="refund-summary-card {{ request()->missing('status') ? 'active' : '' }}" href="{{ route('admin.refunds.index') }}">
+        <a class="refund-summary-card {{ request()->filled('status') ? '' : 'active' }}" href="{{ route('admin.refunds.index', request()->only(['date', 'q'])) }}">
             <span>All requests</span>
             <strong>{{ $counts->sum() }}</strong>
         </a>
     </section>
 
     <section class="panel refund-panel">
+        <form class="refund-filter-form" method="GET" action="{{ route('admin.refunds.index') }}">
+            @if (request()->filled('q'))
+                <input type="hidden" name="q" value="{{ request('q') }}">
+            @endif
+            <div class="refund-filter-field">
+                <label for="refund-request-date">Request date</label>
+                <input id="refund-request-date" type="date" name="date" value="{{ request('date') }}">
+            </div>
+            <div class="refund-filter-field">
+                <label for="refund-request-status">Status</label>
+                <select id="refund-request-status" name="status">
+                    <option value="">All requests</option>
+                    <option value="pending" @selected(request('status') === 'pending')>Needs review</option>
+                    <option value="approved" @selected(request('status') === 'approved')>Approved</option>
+                    <option value="rejected" @selected(request('status') === 'rejected')>Declined</option>
+                    <option value="refunded" @selected(request('status') === 'refunded')>Completed</option>
+                </select>
+            </div>
+            <button class="refund-filter-button" type="submit">Apply filters</button>
+            @if (request()->filled('date') || request()->filled('status'))
+                <a class="refund-filter-reset" href="{{ route('admin.refunds.index', request()->only('q')) }}">Clear filters</a>
+            @endif
+        </form>
+
         @if ($requests->isEmpty())
             <div class="empty-state">
-                {{ request()->filled('status') ? 'No refund requests have this status.' : 'No refund requests yet.' }}
+                {{ request()->filled('status') || request()->filled('date') || request()->filled('q') ? 'No refund requests match these filters.' : 'No refund requests yet.' }}
             </div>
         @else
             <div class="table-wrap">
@@ -68,6 +92,14 @@
         .refund-summary-card strong { color: #f4f1ff; font: 600 18px 'Outfit', sans-serif; }
         .refund-summary-card:hover, .refund-summary-card.active { border-color: #6543bb; background: #211a34; color: #d7caff; }
         .refund-panel { overflow: hidden; }
+        .refund-filter-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding: 14px; border-bottom: 1px solid #2b2634; }
+        .refund-filter-field { display: grid; min-width: 170px; gap: 5px; }
+        .refund-filter-field label { color: #a9a2b1; font-size: 9px; }
+        .refund-filter-field input, .refund-filter-field select { min-height: 34px; padding: 0 9px; border: 1px solid #302a3b; border-radius: 5px; color: #eeeaf5; background: #13111a; font: inherit; font-size: 10px; }
+        .refund-filter-button { min-height: 34px; padding: 0 12px; border: 1px solid #5235a0; border-radius: 5px; color: #fff; background: #5127d2; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .refund-filter-button:hover { filter: brightness(1.15); }
+        .refund-filter-reset { min-height: 34px; display: inline-flex; align-items: center; padding: 0 4px; color: #c4b1ff; font-size: 10px; text-decoration: none; }
+        .refund-filter-reset:hover { color: #fff; }
         .refund-table { min-width: 680px; }
         .refund-order-link { color: #c4b1ff; font-weight: 600; text-decoration: none; }
         .refund-order-link:hover { color: #fff; }

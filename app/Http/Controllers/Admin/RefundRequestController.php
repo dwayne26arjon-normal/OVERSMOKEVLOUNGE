@@ -22,6 +22,7 @@ class RefundRequestController extends Controller
     {
         $request->validate([
             'status' => ['nullable', Rule::in(self::STATUSES)],
+            'date' => ['nullable', 'date_format:Y-m-d'],
         ]);
 
         $requests = RefundRequest::query()
@@ -44,6 +45,7 @@ class RefundRequestController extends Controller
                 });
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->toString()))
+            ->when($request->filled('date'), fn ($query) => $query->whereDate('created_at', $request->string('date')->toString()))
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 ELSE 3 END")
             ->latest()
             ->paginate(15)

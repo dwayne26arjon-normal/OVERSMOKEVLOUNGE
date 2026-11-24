@@ -178,6 +178,14 @@
                 <form class="topbar-search" method="GET" action="{{ request()->routeIs('admin.refunds.*') ? route('admin.refunds.index') : (request()->routeIs('admin.orders.*') ? route('admin.orders.index') : route('admin.products.index')) }}" role="search">
                     <label class="sr-only" for="admin-search">Search {{ request()->routeIs('admin.refunds.*') ? 'refund requests' : (request()->routeIs('admin.orders.*') ? 'orders' : 'products') }}</label>
                     <input id="admin-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search {{ request()->routeIs('admin.refunds.*') ? 'refund requests...' : (request()->routeIs('admin.orders.*') ? 'orders...' : 'products...') }}">
+                    @if (request()->routeIs('admin.refunds.*'))
+                        @if (request()->filled('date'))
+                            <input type="hidden" name="date" value="{{ request('date') }}">
+                        @endif
+                        @if (request()->filled('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+                    @endif
                     <span class="search-icon" aria-hidden="true">⌕</span>
                 </form>
                 <div class="admin-notifications"

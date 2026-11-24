@@ -14,6 +14,46 @@ class RefundRequestManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_admin_can_filter_refund_requests_by_submission_date_and_status(): void
+    {
+        $admin = $this->createAdmin();
+        $today = now()->toDateString();
+        $needsReview = $this->createRefundRequest();
+        $approved = $this->createRefundRequest();
+        $approved->update(['status' => 'approved']);
+        $declined = $this->createRefundRequest();
+        $declined->update(['status' => 'rejected']);
+        $completed = $this->createRefundRequest();
+        $completed->update(['status' => 'refunded']);
+        $older = $this->createRefundRequest();
+        $older->forceFill(['created_at' => now()->subDay()])->save();
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refunds.index', ['date' => $today]))
+            ->assertOk()
+            ->assertSee($needsReview->order->order_number)
+            ->assertSee($approved->order->order_number)
+            ->assertSee($declined->order->order_number)
+            ->assertSee($completed->order->order_number)
+            ->assertDontSee($older->order->order_number)
+            ->assertSee('value="'.$today.'"', false)
+            ->assertSee('type="hidden" name="date" value="'.$today.'"', false)
+            ->assertSee('Needs review')
+            ->assertSee('Approved')
+            ->assertSee('Declined')
+            ->assertSee('Completed')
+            ->assertSee('All requests');
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refunds.index', ['date' => $today, 'status' => 'approved']))
+            ->assertOk()
+            ->assertSee('type="hidden" name="status" value="approved"', false)
+            ->assertSee($approved->order->order_number)
+            ->assertDontSee($needsReview->order->order_number)
+            ->assertDontSee($declined->order->order_number)
+            ->assertDontSee($completed->order->order_number);
+    }
+
     public function test_admin_can_review_a_request_and_record_manual_refund_completion(): void
     {
         $admin = $this->createAdmin();

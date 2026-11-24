@@ -55,11 +55,7 @@
                             <td>{{ $order->items_count }} {{ \Illuminate\Support\Str::plural('item', $order->items_count) }}</td>
                             <td>₱{{ number_format((float) $order->total, 2) }}</td>
                             <td><span class="order-status-badge status-{{ $order->status }}">{{ ucfirst($order->status) }}</span></td>
-                            <td>
-                                <a class="table-action {{ $order->status === 'processing' ? 'order-review-action' : '' }}" href="{{ route('admin.orders.show', $order) }}">
-                                    {{ $order->status === 'processing' ? 'Review order' : 'View details' }}
-                                </a>
-                            </td>
+                            <td><a class="table-action" href="{{ route('admin.orders.show', $order) }}">View details</a></td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -100,8 +96,6 @@
         .status-processing { border-color: rgba(212,160,45,.28); background: rgba(160,117,18,.1); color: #e8c35f; }
         .order-row-needs-attention td { background: rgba(160,117,18,.055); }
         .order-row-needs-attention td:first-child { box-shadow: inset 3px 0 #c9972e; }
-        .order-review-action { display: inline-flex; min-height: 23px; align-items: center; padding: 0 8px; border: 1px solid rgba(212,160,45,.32); border-radius: 4px; background: rgba(160,117,18,.12); color: #e8c35f; }
-        .order-review-action:hover { border-color: rgba(232,195,95,.65); background: rgba(160,117,18,.22); color: #ffe295; }
         .status-shipped { border-color: rgba(72,143,240,.3); background: rgba(30,59,102,.2); color: #73adff; }
         .status-completed { border-color: rgba(48,180,122,.24); background: rgba(28,125,81,.1); color: #60d9a1; }
         .status-cancelled { border-color: rgba(225,77,97,.27); background: rgba(151,34,52,.12); color: #ff7888; }

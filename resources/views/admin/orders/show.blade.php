@@ -32,21 +32,6 @@
         <div class="order-error" role="alert">{{ $message }}</div>
     @enderror
 
-    @if ($order->status === 'processing')
-        <aside class="order-review-checklist" data-order-review-checklist aria-labelledby="order-review-checklist-title">
-            <span class="order-review-checklist-icon" aria-hidden="true">!</span>
-            <div>
-                <h2 id="order-review-checklist-title">Before updating this order, check these items</h2>
-                <ul>
-                    <li>Confirm the customer's contact information and delivery address.</li>
-                    <li>Verify the ordered products, variants, quantities, and total.</li>
-                    <li>Review the payment method and update the status to match the order's actual progress.</li>
-                    <li>Cancelling an order returns its items to available inventory.</li>
-                </ul>
-            </div>
-        </aside>
-    @endif
-
     <section class="order-detail-grid">
         <article class="panel detail-card customer-card">
             <div class="detail-card-heading">
@@ -150,10 +135,6 @@
         .status-confirm-actions .status-confirm-submit { border-color: #7655df; color: #fff; background: #6232e8; font-weight: 600; }
         .status-confirm-actions .status-confirm-submit:hover { background: #7655f2; }
         .status-confirm-actions button:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 3px; }
-        .order-review-checklist { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; padding: 14px; border: 1px solid rgba(212,160,45,.38); border-left: 3px solid #d4a02d; border-radius: 7px; background: linear-gradient(110deg, rgba(160,117,18,.14), rgba(160,117,18,.045)); }
-        .order-review-checklist-icon { display: grid; width: 25px; height: 25px; flex: 0 0 25px; place-items: center; border: 1px solid rgba(232,195,95,.4); border-radius: 50%; color: #e8c35f; background: rgba(160,117,18,.18); font-size: 13px; font-weight: 700; }
-        .order-review-checklist h2 { margin: 0 0 7px; color: #f0d788; font: 600 12px 'Outfit', sans-serif; }
-        .order-review-checklist ul { display: grid; gap: 4px; margin: 0; padding-left: 16px; color: #c9c1ad; font-size: 10px; line-height: 1.5; }
         .order-detail-grid { display: grid; grid-template-columns: minmax(240px, .85fr) minmax(0, 1.15fr); gap: 14px; align-items: start; }
         .detail-card { min-width: 0; padding: 15px; }
         .detail-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding-bottom: 11px; border-bottom: 1px solid #2b2634; }

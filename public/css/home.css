@@ -163,9 +163,10 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .featured-carousel-arrow svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
 .featured-carousel-toggle { min-height: 28px; padding: 0 8px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(14,12,32,.75); color: #e7ddff; font-size: 9px; transition: background .2s, border-color .2s; }
 .featured-carousel-toggle:hover, .featured-carousel-toggle:focus-visible { border-color: #b7a5ff; background: rgba(79,31,240,.75); }
-.featured-carousel-dots { display: flex; align-items: center; gap: 5px; }
-.featured-carousel-dot { width: 7px; height: 7px; padding: 0; border-radius: 50%; background: rgba(255,255,255,.42); transition: width .2s, background .2s; }
-.featured-carousel-dot[aria-current="true"] { width: 18px; border-radius: 999px; background: #c4b5fd; }
+.featured-carousel-dots-window { width: 72px; flex: 0 0 72px; overflow: hidden; }
+.featured-carousel-dots { position: relative; display: flex; width: max-content; align-items: center; gap: 5px; transition: transform .22s ease; }
+.featured-carousel-dot { display: block; width: 7px; height: 7px; flex: 0 0 7px; padding: 0; border-radius: 50%; background: rgba(255,255,255,.42); transition: width .2s, flex-basis .2s, background .2s; }
+.featured-carousel-dot[aria-current="true"] { width: 18px; flex-basis: 18px; border-radius: 999px; background: #c4b5fd; }
 
 /* ---------- Scrollable products area ---------- */
 .content { flex: 1; min-height: 0; overflow: visible; padding: 0 32px 40px; scroll-behavior: smooth; }

@@ -28,6 +28,32 @@ class AdminOrderManagementTest extends TestCase
         $this->assertSame(1, substr_count($html, 'class="admin-pagination-number'));
     }
 
+    public function test_order_list_shows_page_number_and_total_pages(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::create([
+            'name' => 'Cloud Berry',
+            'category' => 'E-liquids',
+            'price' => 450,
+            'stock' => 10,
+            'is_active' => true,
+        ]);
+        foreach (range(1, 11) as $number) {
+            $this->createOrder($product);
+        }
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.orders.index'))
+            ->assertOk()
+            ->assertSee('Page 1 of 2')
+            ->assertSee('data-pagination-window', false);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.orders.index', ['page' => 2]))
+            ->assertOk()
+            ->assertSee('Page 2 of 2');
+    }
+
     public function test_admin_can_view_order_list_details_and_printable_invoice(): void
     {
         $admin = $this->createAdmin();

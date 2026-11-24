@@ -18,6 +18,30 @@
         let hasFocus = false;
         let manuallyPaused = false;
         const autoplayToggle = carousel.querySelector('[data-featured-toggle]');
+        const dotsWindow = carousel.querySelector('[data-featured-dots-window]');
+        const dotsTrack = carousel.querySelector('[data-featured-dots]');
+
+        const updateIndicators = () => {
+            dots.forEach((dot, dotIndex) => {
+                if (dotIndex === activeIndex) {
+                    dot.setAttribute('aria-current', 'true');
+                    dot.tabIndex = 0;
+                } else {
+                    dot.removeAttribute('aria-current');
+                    dot.tabIndex = -1;
+                }
+            });
+
+            const activeDot = dots[activeIndex];
+            if (!dotsWindow || !dotsTrack || !activeDot) return;
+
+            const maxOffset = Math.max(0, dotsTrack.scrollWidth - dotsWindow.clientWidth);
+            const centeredOffset = activeDot.offsetLeft + activeDot.offsetWidth / 2 - dotsWindow.clientWidth / 2;
+            const offset = Math.max(0, Math.min(maxOffset, centeredOffset));
+            dotsTrack.style.transform = `translateX(${-offset}px)`;
+        };
+
+        updateIndicators();
 
         const showSlide = (index, direction = index > activeIndex ? 'next' : 'previous') => {
             const previousIndex = activeIndex;
@@ -31,15 +55,7 @@
                     slide.classList.add('is-active', `slide-${direction}`);
                 }
             });
-            dots.forEach((dot, dotIndex) => {
-                if (dotIndex === activeIndex) {
-                    dot.setAttribute('aria-current', 'true');
-                    dot.tabIndex = 0;
-                } else {
-                    dot.removeAttribute('aria-current');
-                    dot.tabIndex = -1;
-                }
-            });
+            updateIndicators();
         };
 
         const stopAutoplay = () => {

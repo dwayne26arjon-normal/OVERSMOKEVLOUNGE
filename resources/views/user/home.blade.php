@@ -118,10 +118,12 @@
                                 <button class="featured-carousel-arrow" type="button" data-featured-previous aria-label="Previous featured product">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
                                 </button>
-                                <div class="featured-carousel-dots">
-                                    @foreach ($featuredProducts as $featuredProduct)
-                                        <button class="featured-carousel-dot" type="button" data-featured-dot="{{ $loop->index }}" aria-label="Show featured product {{ $loop->iteration }}" @if ($loop->first) aria-current="true" @endif></button>
-                                    @endforeach
+                                <div class="featured-carousel-dots-window" data-featured-dots-window role="group" aria-label="Featured slide indicators">
+                                    <div class="featured-carousel-dots" data-featured-dots>
+                                        @foreach ($featuredProducts as $featuredProduct)
+                                            <button class="featured-carousel-dot" type="button" data-featured-dot="{{ $loop->index }}" aria-label="Show featured product {{ $loop->iteration }}" @if ($loop->first) aria-current="true" @endif></button>
+                                        @endforeach
+                                    </div>
                                 </div>
                                 <button class="featured-carousel-arrow" type="button" data-featured-next aria-label="Next featured product">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>

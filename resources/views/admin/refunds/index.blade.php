@@ -80,7 +80,7 @@
                 </table>
             </div>
             <div class="pagination pagination-window">
-                <span>Showing {{ $requests->firstItem() }}-{{ $requests->lastItem() }} of {{ $requests->total() }} requests</span>
+                <span>Showing {{ $requests->firstItem() }}-{{ $requests->lastItem() }} of {{ $requests->total() }} requests · Page {{ $requests->currentPage() }} of {{ $requests->lastPage() }}</span>
                 @if ($requests->hasPages())
                     {{ $requests->links('admin.pagination.scroll') }}
                 @endif

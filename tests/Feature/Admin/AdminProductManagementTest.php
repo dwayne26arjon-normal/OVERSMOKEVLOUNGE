@@ -48,6 +48,46 @@ class AdminProductManagementTest extends TestCase
             ->assertDontSee('onsubmit="return confirm(', false);
     }
 
+    public function test_product_and_inventory_lists_use_scroll_pagination_with_page_totals(): void
+    {
+        $admin = $this->createAdmin();
+        foreach (range(1, 11) as $number) {
+            Product::create([
+                'name' => "Product {$number}",
+                'category' => 'Devices',
+                'price' => 1000,
+                'stock' => 5,
+                'is_active' => true,
+            ]);
+        }
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.products.index'))
+            ->assertOk()
+            ->assertSee('Page 1 of 2')
+            ->assertSee('data-pagination-window', false)
+            ->assertSee('rel="next"', false);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.products.index', ['page' => 2]))
+            ->assertOk()
+            ->assertSee('Page 2 of 2')
+            ->assertSee('rel="prev"', false);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.inventory.index'))
+            ->assertOk()
+            ->assertSee('Page 1 of 2')
+            ->assertSee('data-pagination-window', false)
+            ->assertSee('rel="next"', false);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.inventory.index', ['page' => 2]))
+            ->assertOk()
+            ->assertSee('Page 2 of 2')
+            ->assertSee('rel="prev"', false);
+    }
+
     public function test_admin_inventory_shows_product_counts_and_filters_by_category_and_stock(): void
     {
         $admin = $this->createAdmin();

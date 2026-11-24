@@ -67,6 +67,7 @@ class RefundRequestManagementTest extends TestCase
             ->get(route('admin.refunds.index'))
             ->assertOk()
             ->assertSee('Showing 1-10 of 11 requests')
+            ->assertSee('Page 1 of 2')
             ->assertSee('Current page, 1', false)
             ->assertSee('rel="next"', false)
             ->assertDontSee('Go to page', false);
@@ -75,6 +76,7 @@ class RefundRequestManagementTest extends TestCase
             ->get(route('admin.refunds.index', ['page' => 2]))
             ->assertOk()
             ->assertSee('Showing 11-11 of 11 requests')
+            ->assertSee('Page 2 of 2')
             ->assertSee('Current page, 2', false)
             ->assertSee('rel="prev"', false)
             ->assertDontSee('rel="next"', false);

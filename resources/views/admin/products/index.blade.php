@@ -92,10 +92,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="pagination">
-                <span>Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} products</span>
+            <div class="pagination pagination-window">
+                <span>Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} products · Page {{ $products->currentPage() }} of {{ $products->lastPage() }}</span>
                 @if ($products->hasPages())
-                    {{ $products->links() }}
+                    {{ $products->links('admin.pagination.scroll') }}
                 @endif
             </div>
         @endif

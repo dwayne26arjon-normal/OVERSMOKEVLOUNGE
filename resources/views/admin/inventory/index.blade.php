@@ -122,10 +122,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="inventory-footer">
-                <span>Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} products</span>
+            <div class="pagination pagination-window inventory-footer">
+                <span>Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} products · Page {{ $products->currentPage() }} of {{ $products->lastPage() }}</span>
                 @if ($products->hasPages())
-                    <div class="pagination">{{ $products->links() }}</div>
+                    {{ $products->links('admin.pagination.scroll') }}
                 @endif
             </div>
         @endif
@@ -194,9 +194,6 @@
         .edit-action { color: #aaa4b2; }
         .delete-action { color: #fb4258; }
         .inventory-footer { display: flex; min-height: 34px; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 11px; border-top: 1px solid #26212f; color: #797382; font-size: 8px; }
-        .inventory-footer .pagination { border: 0; padding: 0; }
-        .inventory-footer .pagination nav { align-items: center; }
-        .inventory-footer .pagination a, .inventory-footer .pagination span[aria-current] span, .inventory-footer .pagination span[aria-disabled] span { min-width: 20px; height: 20px; font-size: 8px; }
         .delete-confirm-dialog { width: min(390px, calc(100vw - 32px)); padding: 24px; border: 1px solid #393044; border-radius: 12px; background: #17141f; color: #f4f1ff; box-shadow: 0 22px 70px rgba(0,0,0,.55); }
         .delete-confirm-dialog::backdrop { background: rgba(5,4,8,.72); backdrop-filter: blur(3px); }
         .delete-dialog-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgba(255,120,136,.3); border-radius: 50%; background: rgba(151,34,52,.15); color: #ff7888; font-size: 20px; font-weight: 700; }

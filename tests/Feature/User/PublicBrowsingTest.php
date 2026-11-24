@@ -72,6 +72,7 @@ class PublicBrowsingTest extends TestCase
             ->assertSee('class="banner-featured" aria-label="Featured products"', false)
             ->assertSee('data-featured-next', false)
             ->assertSee('data-featured-dot="1"', false)
+            ->assertSee('data-featured-dots-window', false)
             ->assertSee('data-featured-toggle', false)
             ->assertSee(route('products.show', Product::where('name', 'Featured Product')->first()), false)
             ->assertSee(route('products.show', Product::where('name', 'Regular Product')->first()), false)

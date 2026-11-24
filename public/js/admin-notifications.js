@@ -8,11 +8,24 @@
     const count = document.getElementById('notificationCount');
     const status = document.getElementById('notificationStatus');
     const markAllButton = document.getElementById('markAllNotificationsRead');
+    const ordersBadge = document.querySelector('[data-admin-orders-unread-count]');
+    const refundsBadge = document.querySelector('[data-admin-refunds-unread-count]');
+    const ordersLink = ordersBadge.closest('a');
+    const refundsLink = refundsBadge.closest('a');
     const csrfToken = root.dataset.csrfToken;
     let knownIds = new Set();
     let initialized = false;
     let checking = false;
     let toastTimer;
+
+    function renderSidebarBadge(badge, link, value, label) {
+        const unreadCount = Math.max(0, Number(value) || 0);
+        badge.hidden = unreadCount === 0;
+        badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+        link.setAttribute('aria-label', unreadCount > 0
+            ? `${label}, ${unreadCount} unread`
+            : label);
+    }
 
     function showToast(notification) {
         const toast = document.getElementById('orderToast');
@@ -51,6 +64,8 @@
         const unreadCount = Number(payload.unread_count) || 0;
         count.hidden = unreadCount === 0;
         count.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+        renderSidebarBadge(ordersBadge, ordersLink, payload.unread_orders_count, 'Orders');
+        renderSidebarBadge(refundsBadge, refundsLink, payload.unread_refund_requests_count, 'Refund requests');
         list.replaceChildren();
 
         if (!notifications.length) {

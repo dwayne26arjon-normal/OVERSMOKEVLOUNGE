@@ -48,7 +48,7 @@ class RefundRequestController extends Controller
             ->when($request->filled('date'), fn ($query) => $query->whereDate('created_at', $request->string('date')->toString()))
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 ELSE 3 END")
             ->latest()
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         $counts = RefundRequest::query()

@@ -54,6 +54,30 @@ class RefundRequestManagementTest extends TestCase
             ->assertDontSee($completed->order->order_number);
     }
 
+    public function test_refund_list_shows_one_page_number_and_advances_with_the_next_arrow(): void
+    {
+        $admin = $this->createAdmin();
+        for ($i = 0; $i < 11; $i++) {
+            $this->createRefundRequest();
+        }
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refunds.index'))
+            ->assertOk()
+            ->assertSee('Showing 1-10 of 11 requests')
+            ->assertSee('Current page, 1', false)
+            ->assertSee('rel="next"', false)
+            ->assertDontSee('Go to page', false);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refunds.index', ['page' => 2]))
+            ->assertOk()
+            ->assertSee('Showing 11-11 of 11 requests')
+            ->assertSee('Current page, 2', false)
+            ->assertSee('rel="prev"', false)
+            ->assertDontSee('rel="next"', false);
+    }
+
     public function test_admin_can_review_a_request_and_record_manual_refund_completion(): void
     {
         $admin = $this->createAdmin();

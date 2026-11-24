@@ -111,7 +111,11 @@
                 deleteButton.textContent = 'Delete';
                 deleteButton.setAttribute('aria-label', 'Delete this message');
                 deleteButton.addEventListener('click', async () => {
-                    if (deleteButton.disabled || !window.confirm('Delete this message?')) return;
+                    if (deleteButton.disabled || !await window.showChatConfirmation({
+                        title: 'Delete this message?',
+                        message: 'This message will be permanently deleted.',
+                        confirmLabel: 'Delete message'
+                    })) return;
 
                     deleteButton.disabled = true;
                     status.textContent = '';

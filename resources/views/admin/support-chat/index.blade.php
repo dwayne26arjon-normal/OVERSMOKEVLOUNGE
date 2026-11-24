@@ -44,6 +44,7 @@
             </form>
         </section>
     </section>
+    @include('components.chat-confirmation-dialog')
 @endsection
 
 @push('styles')
@@ -68,6 +69,17 @@
         .admin-chat-delete { flex: 0 0 auto; padding: 6px 9px; border: 1px solid rgba(255,101,123,.35); border-radius: 6px; color: #ff9aa6; background: rgba(139,43,61,.13); font: inherit; font-size: 9px; cursor: pointer; }
         .admin-chat-delete:hover, .admin-chat-delete:focus-visible { border-color: #ff9aa6; outline: 0; }
         .admin-chat-delete:disabled { opacity: .6; cursor: wait; }
+        .chat-confirm-dialog { width: min(420px, calc(100% - 32px)); padding: 24px; border: 1px solid rgba(255,101,123,.4); border-radius: 14px; color: #f4f1ff; background: #15121c; box-shadow: 0 24px 80px rgba(0,0,0,.58); }
+        .chat-confirm-dialog::backdrop { background: rgba(5,4,8,.75); backdrop-filter: blur(4px); }
+        .chat-confirm-icon { display: grid; width: 38px; height: 38px; margin-bottom: 12px; place-items: center; border: 1px solid rgba(255,101,123,.4); border-radius: 50%; color: #ff9aa6; background: rgba(139,43,61,.16); font-size: 19px; font-weight: 700; }
+        .chat-confirm-eyebrow { margin: 0 0 5px; color: #ff9aa6; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .chat-confirm-dialog h2 { margin: 0; color: #f4f1ff; font: 600 16px 'Outfit', sans-serif; }
+        .chat-confirm-dialog > p:not(.chat-confirm-eyebrow) { margin: 8px 0 0; color: #aaa4b2; font-size: 11px; line-height: 1.55; }
+        .chat-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 21px; }
+        .chat-confirm-actions button { min-height: 34px; padding: 0 12px; border: 1px solid #393347; border-radius: 6px; color: #d0cad8; background: #1b1823; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .chat-confirm-actions button:focus-visible { outline: 2px solid #a98cff; outline-offset: 2px; }
+        .chat-confirm-actions .chat-confirm-proceed { border-color: #9c3e50; color: #fff; background: #8d3043; }
+        .chat-confirm-actions .chat-confirm-proceed:hover { border-color: #e85c74; background: #a63b50; }
         .admin-chat-thread-messages { display: flex; min-height: 320px; max-height: 580px; flex-direction: column; gap: 10px; overflow-y: auto; padding: 16px; }
         .admin-chat-bubble { display: grid; max-width: 82%; align-self: flex-start; gap: 5px; padding: 9px 11px; border: 1px solid #332d3f; border-radius: 10px 10px 10px 3px; color: #e7e2ee; background: #1b1823; }
         .admin-chat-bubble.is-mine { align-self: flex-end; border-color: rgba(130,98,220,.45); border-radius: 10px 10px 3px 10px; background: rgba(100,72,177,.25); }
@@ -99,5 +111,6 @@
 @endpush
 
 @push('scripts')
+    <script defer src="{{ asset('js/chat-confirmation.js') }}?v={{ filemtime(public_path('js/chat-confirmation.js')) }}"></script>
     <script defer src="{{ asset('js/admin-support-chat.js') }}?v={{ filemtime(public_path('js/admin-support-chat.js')) }}"></script>
 @endpush

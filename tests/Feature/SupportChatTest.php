@@ -89,7 +89,9 @@ class SupportChatTest extends TestCase
             ->assertSee('data-user-support-chat', false)
             ->assertSee(route('support-chat.index'), false)
             ->assertSee(route('support-chat.unread-count'), false)
-            ->assertSee(route('support-chat.messages.destroy', ['message' => '__MESSAGE_ID__']), false);
+            ->assertSee(route('support-chat.messages.destroy', ['message' => '__MESSAGE_ID__']), false)
+            ->assertSee('data-chat-confirm-dialog', false)
+            ->assertSee(asset('js/chat-confirmation.js'), false);
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.support-chat.index'))
@@ -97,7 +99,9 @@ class SupportChatTest extends TestCase
             ->assertSee('data-admin-support-chat', false)
             ->assertSee('Support chat')
             ->assertSee('data-chat-delete', false)
-            ->assertSee(route('admin.support-chat.conversations.destroy', ['conversation' => '__CONVERSATION_ID__']), false);
+            ->assertSee(route('admin.support-chat.conversations.destroy', ['conversation' => '__CONVERSATION_ID__']), false)
+            ->assertSee('data-chat-confirm-dialog', false)
+            ->assertSee(asset('js/chat-confirmation.js'), false);
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.dashboard'))

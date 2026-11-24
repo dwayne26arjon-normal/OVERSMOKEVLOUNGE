@@ -78,6 +78,8 @@
             </form>
         </section>
     </div>
+    @include('components.chat-confirmation-dialog')
     <script defer src="{{ asset('js/user-notifications.js') }}?v={{ filemtime(public_path('js/user-notifications.js')) }}"></script>
+    <script defer src="{{ asset('js/chat-confirmation.js') }}?v={{ filemtime(public_path('js/chat-confirmation.js')) }}"></script>
     <script defer src="{{ asset('js/user-support-chat.js') }}?v={{ filemtime(public_path('js/user-support-chat.js')) }}"></script>
 @endauth

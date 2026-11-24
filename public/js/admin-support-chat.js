@@ -186,7 +186,11 @@
 
     deleteButton.addEventListener('click', async () => {
         if (!selectedConversationId || deleteButton.disabled) return;
-        if (!window.confirm('Delete this conversation and all its messages? This cannot be undone.')) return;
+        if (!await window.showChatConfirmation({
+            title: 'Delete this conversation?',
+            message: 'This permanently deletes the conversation and all of its messages.',
+            confirmLabel: 'Delete conversation'
+        })) return;
 
         deleteButton.disabled = true;
         status.textContent = '';

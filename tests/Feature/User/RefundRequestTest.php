@@ -66,8 +66,8 @@ class RefundRequestTest extends TestCase
             ->getJson(route('admin.orders.notifications'))
             ->assertOk()
             ->assertJsonPath('unread_count', 1)
-            ->assertJsonPath('unread_orders_count', 0)
-            ->assertJsonPath('unread_refund_requests_count', 1)
+            ->assertJsonPath('processing_orders_count', 0)
+            ->assertJsonPath('pending_refund_requests_count', 1)
             ->assertJsonPath('notifications.0.kind', 'refund_request')
             ->assertJsonPath('notifications.0.order_number', $order->order_number)
             ->assertJsonPath('notifications.0.url', route('admin.refunds.show', $refundRequest));

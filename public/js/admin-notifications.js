@@ -64,8 +64,8 @@
         const unreadCount = Number(payload.unread_count) || 0;
         count.hidden = unreadCount === 0;
         count.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
-        renderSidebarBadge(ordersBadge, ordersLink, payload.unread_orders_count, 'Orders');
-        renderSidebarBadge(refundsBadge, refundsLink, payload.unread_refund_requests_count, 'Refund requests');
+        renderSidebarBadge(ordersBadge, ordersLink, payload.processing_orders_count, 'Orders awaiting processing');
+        renderSidebarBadge(refundsBadge, refundsLink, payload.pending_refund_requests_count, 'Refund requests awaiting review');
         list.replaceChildren();
 
         if (!notifications.length) {

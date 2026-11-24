@@ -83,8 +83,8 @@ class AdminOrderManagementTest extends TestCase
             ->getJson(route('admin.orders.notifications'))
             ->assertOk()
             ->assertJsonPath('unread_count', 1)
-            ->assertJsonPath('unread_orders_count', 1)
-            ->assertJsonPath('unread_refund_requests_count', 0)
+            ->assertJsonPath('processing_orders_count', 1)
+            ->assertJsonPath('pending_refund_requests_count', 0)
             ->assertJsonPath('notifications.0.order_number', $order->order_number)
             ->assertJsonPath('notifications.0.buyer', $order->customer_name);
 
@@ -97,7 +97,7 @@ class AdminOrderManagementTest extends TestCase
             ->getJson(route('admin.orders.notifications'))
             ->assertOk()
             ->assertJsonPath('unread_count', 0)
-            ->assertJsonPath('unread_orders_count', 0)
+            ->assertJsonPath('processing_orders_count', 1)
             ->assertJsonPath('notifications.0.read_at', fn ($value) => $value !== null);
 
         $this->actingAs($admin, 'admin')

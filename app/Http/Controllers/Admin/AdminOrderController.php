@@ -7,6 +7,7 @@ use App\Mail\OrderInvoiceMail;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\RefundRequest;
 use App\Notifications\NewOrderReceived;
 use App\Notifications\OrderStatusUpdated;
 use App\Notifications\RefundRequestSubmitted;
@@ -40,11 +41,13 @@ class AdminOrderController extends Controller
             ->get();
         $unreadOrderCount = (int) $unreadCounts->get(NewOrderReceived::class, 0);
         $unreadRefundRequestCount = (int) $unreadCounts->get(RefundRequestSubmitted::class, 0);
+        $processingOrderCount = Order::query()->where('status', 'processing')->count();
+        $pendingRefundRequestCount = RefundRequest::query()->where('status', 'pending')->count();
 
         return response()->json([
             'unread_count' => $unreadOrderCount + $unreadRefundRequestCount,
-            'unread_orders_count' => $unreadOrderCount,
-            'unread_refund_requests_count' => $unreadRefundRequestCount,
+            'processing_orders_count' => $processingOrderCount,
+            'pending_refund_requests_count' => $pendingRefundRequestCount,
             'notifications' => $notifications->map(function ($notification) {
                 $isRefundRequest = $notification->type === RefundRequestSubmitted::class;
 

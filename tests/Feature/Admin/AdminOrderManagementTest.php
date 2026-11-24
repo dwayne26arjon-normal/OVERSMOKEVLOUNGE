@@ -16,15 +16,16 @@ class AdminOrderManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_pagination_renders_a_scrollable_page_number_window(): void
+    public function test_admin_pagination_renders_only_the_current_page_number_with_navigation_arrows(): void
     {
         $paginator = new LengthAwarePaginator([], 100, 10, 7, ['path' => '/admin/orders']);
         $html = view('admin.pagination.scroll', compact('paginator'))->render();
 
         $this->assertStringContainsString('data-pagination-window', $html);
-        $this->assertStringContainsString('Go to page 1', $html);
         $this->assertStringContainsString('Current page, 7', $html);
-        $this->assertStringContainsString('Go to page 10', $html);
+        $this->assertStringContainsString('rel="prev"', $html);
+        $this->assertStringContainsString('rel="next"', $html);
+        $this->assertSame(1, substr_count($html, 'class="admin-pagination-number'));
     }
 
     public function test_admin_can_view_order_list_details_and_printable_invoice(): void

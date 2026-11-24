@@ -10,15 +10,15 @@
             </a>
         @endif
 
-        <div class="admin-pagination-window" data-pagination-window tabindex="0" role="group" aria-label="Page numbers">
+        <div
+            class="admin-pagination-window"
+            data-pagination-window
+            data-page-name="{{ $paginator->getPageName() }}"
+            role="group"
+            aria-label="Page numbers"
+        >
             <div class="admin-pagination-track">
-                @for ($page = 1; $page <= $paginator->lastPage(); $page++)
-                    @if ($page === $paginator->currentPage())
-                        <span class="admin-pagination-number is-current" aria-current="page" aria-label="Current page, {{ $page }}">{{ $page }}</span>
-                    @else
-                        <a class="admin-pagination-number" href="{{ $paginator->url($page) }}" aria-label="Go to page {{ $page }}">{{ $page }}</a>
-                    @endif
-                @endfor
+                <span class="admin-pagination-number is-current" aria-current="page" aria-label="Current page, {{ $paginator->currentPage() }}">{{ $paginator->currentPage() }}</span>
             </div>
         </div>
 

@@ -101,7 +101,7 @@ class AdminOrderManagementTest extends TestCase
             ->get(route('admin.orders.index'))
             ->assertOk()
             ->assertSee('id="notificationButton"', false)
-            ->assertSee('Order notifications')
+            ->assertSee('Notifications')
             ->assertSee('Mark all read')
             ->assertSee('admin-notifications.js');
     }

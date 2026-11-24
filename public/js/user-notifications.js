@@ -52,7 +52,7 @@
         if (!payload.notifications.length) {
             const empty = document.createElement('p');
             empty.className = 'user-notification-empty';
-            empty.textContent = 'No order updates yet.';
+            empty.textContent = 'No notifications yet.';
             list.append(empty);
             return;
         }
@@ -113,8 +113,11 @@
             if (!response.ok) throw new Error(`Notification request failed with status ${response.status}.`);
 
             const payload = await response.json();
-            const freshNotification = initialized && payload.enabled
-                ? payload.notifications.find(notification => !knownIds.has(notification.id) && !notification.read_at)
+            const freshNotification = initialized
+                ? payload.notifications.find(notification =>
+                    !knownIds.has(notification.id)
+                    && !notification.read_at
+                    && (payload.enabled || notification.kind === 'refund_review'))
                 : null;
 
             knownIds = new Set(payload.notifications.map(notification => notification.id));
@@ -132,8 +135,8 @@
         button.setAttribute('aria-expanded', String(open));
         menu.hidden = !open;
         if (open) refreshNotifications().catch(error => {
-            console.error('Unable to load order notifications.', error);
-            showStatus('Order updates could not be loaded. Please try again.');
+            console.error('Unable to load notifications.', error);
+            showStatus('Notifications could not be loaded. Please try again.');
         });
     });
 
@@ -180,20 +183,20 @@
     });
 
     refreshNotifications().catch(error => {
-        console.error('Unable to load order notifications.', error);
-        showStatus('Order updates could not be loaded. Please try again.');
+        console.error('Unable to load notifications.', error);
+        showStatus('Notifications could not be loaded. Please try again.');
     });
     window.setInterval(() => {
         refreshNotifications().catch(error => {
-            console.error('Unable to refresh order notifications.', error);
-            showStatus('Order updates could not be refreshed.');
+            console.error('Unable to refresh notifications.', error);
+            showStatus('Notifications could not be refreshed.');
         });
     }, 10000);
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             refreshNotifications().catch(error => {
-                console.error('Unable to refresh order notifications.', error);
-                showStatus('Order updates could not be refreshed.');
+                console.error('Unable to refresh notifications.', error);
+                showStatus('Notifications could not be refreshed.');
             });
         }
     });

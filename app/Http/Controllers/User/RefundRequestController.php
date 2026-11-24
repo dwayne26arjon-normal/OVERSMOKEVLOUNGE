@@ -5,6 +5,8 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\RefundEvidence;
+use App\Models\User;
+use App\Notifications\RefundRequestSubmitted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +68,11 @@ class RefundRequestController extends Controller
                         'size' => $file->getSize(),
                     ]);
                 }
+
+                User::query()
+                    ->where(fn ($query) => $query->where('is_admin', true)->orWhere('is_staff', true))
+                    ->get()
+                    ->each(fn (User $recipient) => $recipient->notify(new RefundRequestSubmitted($refundRequest)));
             });
         } catch (Throwable $exception) {
             if ($storedPaths !== [] && ! Storage::disk('local')->delete($storedPaths)) {

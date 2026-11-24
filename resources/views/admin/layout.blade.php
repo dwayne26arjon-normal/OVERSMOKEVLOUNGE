@@ -186,13 +186,13 @@
                      data-read-url-template="{{ route('admin.orders.notifications.read', ['notification' => '__NOTIFICATION_ID__']) }}"
                      data-read-all-url="{{ route('admin.orders.notifications.read-all') }}"
                      data-csrf-token="{{ csrf_token() }}">
-                    <button class="notification-button" id="notificationButton" type="button" aria-label="Order notifications" aria-expanded="false" aria-controls="notificationMenu">
+                    <button class="notification-button" id="notificationButton" type="button" aria-label="Notifications" aria-expanded="false" aria-controls="notificationMenu">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
                         <span class="notification-count" id="notificationCount" hidden></span>
                     </button>
                     <div class="notification-menu" id="notificationMenu" hidden>
                         <div class="notification-heading">
-                            <span>Order notifications</span>
+                            <span>Notifications</span>
                             <button class="notification-clear" id="markAllNotificationsRead" type="button">Mark all read</button>
                         </div>
                         <p class="notification-status" id="notificationStatus" role="status" aria-live="polite"></p>

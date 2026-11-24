@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\Order;
 use App\Models\RefundRequest;
 use App\Models\User;
+use App\Notifications\RefundRequestReviewed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -17,6 +18,7 @@ class RefundRequestManagementTest extends TestCase
     {
         $admin = $this->createAdmin();
         $refundRequest = $this->createRefundRequest();
+        $refundRequest->customer->update(['order_notifications_enabled' => false]);
 
         $this->actingAs($admin, 'admin')
             ->get(route('admin.refunds.index'))
@@ -55,6 +57,18 @@ class RefundRequestManagementTest extends TestCase
             'reviewed_by' => $admin->id,
             'admin_note' => 'Approved for the damaged item.',
         ]);
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $refundRequest->user_id,
+            'type' => RefundRequestReviewed::class,
+        ]);
+        $this->actingAs($refundRequest->customer, 'web')
+            ->getJson(route('user.notifications.index'))
+            ->assertOk()
+            ->assertJsonPath('enabled', false)
+            ->assertJsonPath('unread_count', 1)
+            ->assertJsonPath('notifications.0.kind', 'refund_review')
+            ->assertJsonPath('notifications.0.order_number', $refundRequest->order->order_number)
+            ->assertJsonPath('notifications.0.message', 'Your refund request was approved.');
 
         $this->actingAs($admin, 'admin')
             ->patch(route('admin.refunds.update', $refundRequest), [
@@ -107,6 +121,14 @@ class RefundRequestManagementTest extends TestCase
             'admin_note' => 'Please contact the store for more details.',
             'approved_amount' => null,
         ]);
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $refundRequest->user_id,
+            'type' => RefundRequestReviewed::class,
+        ]);
+        $this->assertSame(
+            'Your refund request was declined.',
+            $refundRequest->customer->notifications()->latest()->firstOrFail()->data['message']
+        );
     }
 
     public function test_staff_can_review_refund_requests(): void

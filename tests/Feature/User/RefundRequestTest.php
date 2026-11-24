@@ -5,6 +5,7 @@ namespace Tests\Feature\User;
 use App\Models\Order;
 use App\Models\RefundRequest;
 use App\Models\User;
+use App\Notifications\RefundRequestSubmitted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,8 @@ class RefundRequestTest extends TestCase
     public function test_customer_can_submit_a_private_damage_refund_request_with_evidence(): void
     {
         Storage::fake('local');
+        $admin = User::factory()->create(['is_admin' => true]);
+        $staff = User::factory()->create(['is_staff' => true]);
         $customer = User::factory()->create();
         $otherCustomer = User::factory()->create();
         $order = $this->createOrder($customer);
@@ -42,6 +45,21 @@ class RefundRequestTest extends TestCase
         $this->assertSame($customer->id, $refundRequest->user_id);
         $this->assertSame('pending', $refundRequest->status);
         $this->assertSame('The bottle arrived cracked and leaked.', $refundRequest->description);
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $admin->id,
+            'type' => RefundRequestSubmitted::class,
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $staff->id,
+            'type' => RefundRequestSubmitted::class,
+        ]);
+        $this->actingAs($admin, 'admin')
+            ->getJson(route('admin.orders.notifications'))
+            ->assertOk()
+            ->assertJsonPath('unread_count', 1)
+            ->assertJsonPath('notifications.0.kind', 'refund_request')
+            ->assertJsonPath('notifications.0.order_number', $order->order_number)
+            ->assertJsonPath('notifications.0.url', route('admin.refunds.show', $refundRequest));
         $this->assertCount(2, $refundRequest->evidences);
         Storage::disk('local')->assertExists($refundRequest->evidences->first()->path);
         Storage::disk('local')->assertExists($refundRequest->evidences->last()->path);

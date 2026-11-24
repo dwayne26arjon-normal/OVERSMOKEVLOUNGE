@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Notifications\NewOrderReceived;
 use App\Notifications\OrderStatusUpdated;
+use App\Notifications\RefundRequestSubmitted;
 use App\Support\OrderInventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -28,26 +29,33 @@ class AdminOrderController extends Controller
     {
         $admin = $request->user('admin');
         $notifications = $admin->notifications()
-            ->where('type', NewOrderReceived::class)
+            ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
             ->latest()
             ->limit(30)
             ->get();
 
         return response()->json([
             'unread_count' => $admin->unreadNotifications()
-                ->where('type', NewOrderReceived::class)
+                ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
                 ->count(),
-            'notifications' => $notifications->map(fn ($notification) => [
-                'id' => $notification->id,
-                'order_number' => $notification->data['order_number'] ?? 'Order update',
-                'buyer' => $notification->data['buyer'] ?? 'Customer',
-                'total' => (float) ($notification->data['total'] ?? 0),
-                'items' => (int) ($notification->data['items'] ?? 0),
-                'message' => $notification->data['message'] ?? 'A new order was placed.',
-                'url' => route('admin.orders.show', ['order' => (int) ($notification->data['order_id'] ?? 0)]),
-                'read_at' => $notification->read_at?->toIso8601String(),
-                'created_at' => $notification->created_at?->toIso8601String(),
-            ])->values(),
+            'notifications' => $notifications->map(function ($notification) {
+                $isRefundRequest = $notification->type === RefundRequestSubmitted::class;
+
+                return [
+                    'id' => $notification->id,
+                    'kind' => $isRefundRequest ? 'refund_request' : 'order',
+                    'order_number' => $notification->data['order_number'] ?? 'Order update',
+                    'buyer' => $notification->data['buyer'] ?? 'Customer',
+                    'total' => (float) ($notification->data['total'] ?? 0),
+                    'items' => (int) ($notification->data['items'] ?? 0),
+                    'message' => $notification->data['message'] ?? 'A new order was placed.',
+                    'url' => $isRefundRequest
+                        ? route('admin.refunds.show', ['refundRequest' => (int) ($notification->data['refund_request_id'] ?? 0)])
+                        : route('admin.orders.show', ['order' => (int) ($notification->data['order_id'] ?? 0)]),
+                    'read_at' => $notification->read_at?->toIso8601String(),
+                    'created_at' => $notification->created_at?->toIso8601String(),
+                ];
+            })->values(),
         ])->header('Cache-Control', 'no-store');
     }
 
@@ -55,14 +63,14 @@ class AdminOrderController extends Controller
     {
         $admin = $request->user('admin');
         $admin->notifications()
-            ->where('type', NewOrderReceived::class)
+            ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
             ->whereKey($notification)
             ->firstOrFail()
             ->markAsRead();
 
         return response()->json([
             'unread_count' => $admin->unreadNotifications()
-                ->where('type', NewOrderReceived::class)
+                ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
                 ->count(),
         ]);
     }
@@ -71,7 +79,7 @@ class AdminOrderController extends Controller
     {
         $admin = $request->user('admin');
         $admin->unreadNotifications()
-            ->where('type', NewOrderReceived::class)
+            ->whereIn('type', [NewOrderReceived::class, RefundRequestSubmitted::class])
             ->update(['read_at' => now()]);
 
         return response()->json(['unread_count' => 0]);

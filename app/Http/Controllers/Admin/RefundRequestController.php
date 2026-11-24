@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RefundEvidence;
 use App\Models\RefundRequest;
+use App\Notifications\RefundRequestReviewed;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +96,7 @@ class RefundRequestController extends Controller
                     'reviewed_by' => $request->user('admin')->id,
                     'reviewed_at' => now(),
                 ]);
+                $lockedRequest->customer->notify(new RefundRequestReviewed($lockedRequest));
 
                 return;
             }

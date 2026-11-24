@@ -18,10 +18,13 @@
         const toast = document.getElementById('orderToast');
         toast.replaceChildren();
         const title = document.createElement('strong');
-        title.textContent = 'New purchase received';
+        const isRefundRequest = notification.kind === 'refund_request';
+        title.textContent = isRefundRequest ? 'New refund request' : 'New purchase received';
         const link = document.createElement('a');
         link.href = notification.url;
-        link.textContent = `${notification.order_number} from ${notification.buyer} · ₱${Number(notification.total).toLocaleString('en-PH')}`;
+        link.textContent = isRefundRequest
+            ? `${notification.order_number} · ${notification.buyer}`
+            : `${notification.order_number} from ${notification.buyer} · ₱${Number(notification.total).toLocaleString('en-PH')}`;
         toast.append(title, link);
         toast.hidden = false;
         window.clearTimeout(toastTimer);
@@ -53,7 +56,7 @@
         if (!notifications.length) {
             const empty = document.createElement('p');
             empty.className = 'notification-empty';
-            empty.textContent = 'No order notifications yet.';
+            empty.textContent = 'No notifications yet.';
             list.append(empty);
             return;
         }
@@ -67,7 +70,9 @@
             const title = document.createElement('strong');
             title.textContent = notification.order_number;
             const details = document.createElement('span');
-            details.textContent = `${notification.buyer} · ${notification.items} item${notification.items === 1 ? '' : 's'} · ₱${Number(notification.total).toLocaleString('en-PH')}`;
+            details.textContent = notification.kind === 'refund_request'
+                ? notification.message
+                : `${notification.buyer} · ${notification.items} item${notification.items === 1 ? '' : 's'} · ₱${Number(notification.total).toLocaleString('en-PH')}`;
             const date = document.createElement('time');
             date.dateTime = notification.created_at;
             date.textContent = new Date(notification.created_at).toLocaleString();
@@ -118,8 +123,8 @@
 
     function refreshWithErrorHandling() {
         refreshNotifications().catch(error => {
-            console.error('Unable to load admin order notifications.', error);
-            status.textContent = 'Order notifications could not be loaded. Please try again.';
+            console.error('Unable to load admin notifications.', error);
+            status.textContent = 'Notifications could not be loaded. Please try again.';
         });
     }
 

@@ -10,13 +10,13 @@
             data-read-all-url="{{ route('user.notifications.read-all') }}"
             data-csrf-token="{{ csrf_token() }}"
         >
-            <button class="user-notification-button" id="userNotificationButton" type="button" aria-label="Order notifications" aria-expanded="false" aria-controls="userNotificationMenu">
+            <button class="user-notification-button" id="userNotificationButton" type="button" aria-label="Notifications" aria-expanded="false" aria-controls="userNotificationMenu">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
                 <span class="user-notification-count" data-notification-count hidden></span>
             </button>
-            <section class="user-notification-menu" id="userNotificationMenu" aria-label="Order notifications" hidden>
+            <section class="user-notification-menu" id="userNotificationMenu" aria-label="Notifications" hidden>
                 <div class="user-notification-heading">
-                    <strong>Order updates</strong>
+                    <strong>Notifications</strong>
                     <button class="user-notification-read-all" type="button" data-notification-read-all>Mark all read</button>
                 </div>
                 <p class="user-notification-status" data-notification-status role="status" aria-live="polite"></p>

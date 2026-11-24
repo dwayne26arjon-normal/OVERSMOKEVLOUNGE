@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Notifications\RefundRequestReviewed;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,6 +22,7 @@ class NotificationController extends Controller
                 ->get()
                 ->map(fn ($notification) => [
                     'id' => $notification->id,
+                    'kind' => $notification->type === RefundRequestReviewed::class ? 'refund_review' : 'order',
                     'order_number' => $notification->data['order_number'] ?? 'Order update',
                     'message' => $notification->data['message'] ?? 'Your order was updated.',
                     'url' => route('orders') . '#order-' . (int) ($notification->data['order_id'] ?? 0),

@@ -49,6 +49,12 @@
         .refund-request-form textarea, .refund-request-form input[type="file"] { width: 100%; padding: 10px; border: 1px solid #39313e; border-radius: 6px; background: rgba(9,8,14,.72); color: var(--text); font: inherit; font-size: 11px; }
         .refund-request-form textarea:focus, .refund-request-form input[type="file"]:focus { border-color: rgba(225,77,97,.7); outline: 2px solid rgba(225,77,97,.16); }
         .refund-request-form textarea { min-height: 100px; resize: vertical; }
+        .refund-file-picker { display: flex; min-height: 44px; align-items: center; gap: 9px; padding: 6px; border: 1px solid #39313e; border-radius: 6px; background: rgba(9,8,14,.72); }
+        .refund-file-picker input[type="file"] { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; border: 0; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; }
+        .refund-file-picker-button { display: inline-flex; width: 30px; height: 30px; flex: 0 0 30px; align-items: center; justify-content: center; border: 1px solid rgba(225,77,97,.45); border-radius: 6px; color: #ffb1b8; background: rgba(151,34,52,.2); font-size: 23px; line-height: 1; cursor: pointer; transition: background .2s, border-color .2s; }
+        .refund-file-picker-button:hover { border-color: rgba(255,177,184,.75); background: rgba(151,34,52,.35); }
+        .refund-file-picker input[type="file"]:focus-visible + .refund-file-picker-button { outline: 2px solid rgba(255,177,184,.75); outline-offset: 3px; }
+        .refund-file-name { min-width: 0; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
         .refund-upload-previews { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
         .refund-upload-previews:empty { display: none; }
         .refund-upload-preview { display: grid; gap: 5px; margin: 0; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: #11111b; }
@@ -213,11 +219,19 @@
                                         <label for="refund-description-{{ $order->id }}">Describe the damage and identify the affected item(s)</label>
                                         <textarea id="refund-description-{{ $order->id }}" name="description" maxlength="2000" required placeholder="Tell us what arrived damaged and which item was affected.">{{ (int) old('refund_order_id') === $order->id ? old('description') : '' }}</textarea>
                                         <label for="refund-attachments-{{ $order->id }}">Photos or video (optional)</label>
-                                        <input id="refund-attachments-{{ $order->id }}" type="file" name="attachments[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple data-refund-attachments>
+                                        <div class="refund-file-picker">
+                                            <input id="refund-attachments-{{ $order->id }}" type="file" name="attachments[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple data-refund-attachments aria-label="Choose photos or video evidence">
+                                            <label class="refund-file-picker-button" for="refund-attachments-{{ $order->id }}" title="Add photos or videos"><span aria-hidden="true">+</span></label>
+                                            <span class="refund-file-name" data-refund-file-name>No files selected</span>
+                                        </div>
                                         <div class="refund-upload-previews" data-refund-preview aria-live="polite"></div>
                                         <div class="refund-payment-qr">
                                             <label for="refund-payment-qr-{{ $order->id }}">E-wallet QR code (optional)</label>
-                                            <input id="refund-payment-qr-{{ $order->id }}" type="file" name="payment_qr" accept="image/jpeg,image/png,image/webp" data-refund-payment-qr>
+                                            <div class="refund-file-picker">
+                                                <input id="refund-payment-qr-{{ $order->id }}" type="file" name="payment_qr" accept="image/jpeg,image/png,image/webp" data-refund-payment-qr aria-label="Choose e-wallet QR code image">
+                                                <label class="refund-file-picker-button" for="refund-payment-qr-{{ $order->id }}" title="Add e-wallet QR code"><span aria-hidden="true">+</span></label>
+                                                <span class="refund-file-name" data-refund-payment-qr-file-name>No file selected</span>
+                                            </div>
                                             <div class="refund-upload-previews" data-refund-payment-qr-preview aria-live="polite"></div>
                                             <p class="refund-request-help">Add a clear QR image if you would like to receive an approved refund through your e-wallet. This private image is visible only to you and authorized store staff; the store will arrange payment manually.</p>
                                         </div>
@@ -263,9 +277,14 @@
 
         document.querySelectorAll('[data-refund-attachments]').forEach(input => {
             const previewContainer = input.closest('form').querySelector('[data-refund-preview]');
+            const fileName = input.closest('form').querySelector('[data-refund-file-name]');
             let previewUrls = [];
 
             input.addEventListener('change', () => {
+                const fileCount = input.files?.length || 0;
+                fileName.textContent = fileCount
+                    ? `${fileCount} file${fileCount === 1 ? '' : 's'} selected`
+                    : 'No files selected';
                 previewUrls.forEach(url => URL.revokeObjectURL(url));
                 previewUrls = [];
                 previewContainer.replaceChildren();
@@ -305,9 +324,11 @@
 
         document.querySelectorAll('[data-refund-payment-qr]').forEach(input => {
             const previewContainer = input.closest('form').querySelector('[data-refund-payment-qr-preview]');
+            const fileName = input.closest('form').querySelector('[data-refund-payment-qr-file-name]');
             let previewUrl = null;
 
             input.addEventListener('change', () => {
+                fileName.textContent = input.files?.[0]?.name || 'No file selected';
                 if (previewUrl) URL.revokeObjectURL(previewUrl);
                 previewUrl = null;
                 previewContainer.replaceChildren();

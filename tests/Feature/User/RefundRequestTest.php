@@ -160,6 +160,8 @@ class RefundRequestTest extends TestCase
             ->assertDontSee(route('orders.refunds.store', $cancelledOrder), false)
             ->assertSee('enctype="multipart/form-data"', false)
             ->assertSee('data-refund-preview', false)
+            ->assertSee('refund-file-picker-button', false)
+            ->assertSee('title="Add e-wallet QR code"', false)
             ->assertSee('video/mp4');
     }
 

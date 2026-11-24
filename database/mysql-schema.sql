@@ -220,6 +220,7 @@ CREATE TABLE `refund_requests` (
 CREATE TABLE `refund_evidences` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `refund_request_id` BIGINT UNSIGNED NOT NULL,
+    `purpose` VARCHAR(255) NOT NULL DEFAULT 'evidence',
     `disk` VARCHAR(255) NOT NULL DEFAULT 'local',
     `path` VARCHAR(255) NOT NULL,
     `original_name` VARCHAR(255) NOT NULL,
@@ -255,4 +256,5 @@ INSERT INTO `migrations` (`migration`, `batch`) VALUES
     ('2026_11_20_000000_add_is_staff_to_users_table', 1),
     ('2026_11_20_000001_add_order_notifications_to_users_and_create_notifications_table', 1),
     ('2026_11_20_000002_add_image_path_to_product_variants', 1),
-    ('2026_11_23_000000_create_refund_requests_tables', 1);
+    ('2026_11_23_000000_create_refund_requests_tables', 1),
+    ('2026_11_24_000000_add_purpose_to_refund_evidences_table', 1);

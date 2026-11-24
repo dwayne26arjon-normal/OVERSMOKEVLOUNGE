@@ -36,6 +36,7 @@ class RefundRequestManagementTest extends TestCase
             ->get(route('admin.refunds.show', $refundRequest))
             ->assertOk()
             ->assertSee('Damage description')
+            ->assertSee('class="refund-status status-pending">Pending</span>', false)
             ->assertSee('The package arrived damaged.')
             ->assertSee('Approve request')
             ->assertSee('Approve this refund request for', false)
@@ -153,9 +154,23 @@ class RefundRequestManagementTest extends TestCase
             base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lS8AAAAASUVORK5CYII=')
         );
         $evidence = $refundRequest->evidences()->create([
+            'purpose' => 'evidence',
             'disk' => 'local',
             'path' => $path,
             'original_name' => 'damaged-bottle.png',
+            'mime_type' => 'image/png',
+            'size' => 100,
+        ]);
+        $qrPath = 'refund-evidence/customer-wallet-qr.png';
+        Storage::disk('local')->put(
+            $qrPath,
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lS8AAAAASUVORK5CYII=')
+        );
+        $paymentQr = $refundRequest->evidences()->create([
+            'purpose' => 'payment_qr',
+            'disk' => 'local',
+            'path' => $qrPath,
+            'original_name' => 'customer-wallet-qr.png',
             'mime_type' => 'image/png',
             'size' => 100,
         ]);
@@ -165,6 +180,10 @@ class RefundRequestManagementTest extends TestCase
             ->assertOk()
             ->assertSee('alt="Refund evidence photo 1"', false)
             ->assertSee(route('admin.refund-evidence.preview', $evidence), false)
+            ->assertSee('E-wallet payment QR')
+            ->assertSee('alt="Customer e-wallet payment QR code"', false)
+            ->assertSee(route('admin.refund-evidence.preview', $paymentQr), false)
+            ->assertSee(route('admin.refund-evidence.download', $paymentQr), false)
             ->assertDontSee('damaged-bottle.png');
 
         $this->actingAs($admin, 'admin')

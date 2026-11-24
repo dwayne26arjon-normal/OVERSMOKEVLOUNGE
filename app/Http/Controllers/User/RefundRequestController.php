@@ -24,6 +24,7 @@ class RefundRequestController extends Controller
             'description' => ['required', 'string', 'max:2000'],
             'attachments' => ['nullable', 'array', 'max:3'],
             'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,mp4,mov,webm', 'max:12288'],
+            'payment_qr' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
         $storedPaths = [];
 
@@ -61,6 +62,26 @@ class RefundRequestController extends Controller
 
                     $originalName = basename(str_replace('\\', '/', $file->getClientOriginalName()));
                     $refundRequest->evidences()->create([
+                        'purpose' => 'evidence',
+                        'disk' => 'local',
+                        'path' => $path,
+                        'original_name' => mb_substr($originalName, 0, 255),
+                        'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
+                        'size' => $file->getSize(),
+                    ]);
+                }
+
+                if (isset($data['payment_qr'])) {
+                    $file = $data['payment_qr'];
+                    $path = $file->store('refund-evidence', 'local');
+                    if (! is_string($path) || $path === '') {
+                        throw new RuntimeException('Unable to store the e-wallet QR image.');
+                    }
+                    $storedPaths[] = $path;
+
+                    $originalName = basename(str_replace('\\', '/', $file->getClientOriginalName()));
+                    $refundRequest->evidences()->create([
+                        'purpose' => 'payment_qr',
                         'disk' => 'local',
                         'path' => $path,
                         'original_name' => mb_substr($originalName, 0, 255),

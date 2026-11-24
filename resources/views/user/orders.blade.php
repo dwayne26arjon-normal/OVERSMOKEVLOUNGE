@@ -54,6 +54,8 @@
         .refund-upload-preview { display: grid; gap: 5px; margin: 0; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: #11111b; }
         .refund-upload-preview img, .refund-upload-preview video { display: block; width: 100%; max-height: 180px; aspect-ratio: 4 / 3; border-radius: 4px; background: #09080d; object-fit: contain; }
         .refund-upload-preview figcaption { color: var(--muted); font-size: 9px; }
+        .refund-payment-qr { display: grid; gap: 8px; padding: 10px; border: 1px solid rgba(167,139,250,.24); border-radius: 7px; background: rgba(91,63,145,.08); }
+        .refund-payment-qr > label { color: #d7cbff; }
         .refund-request-help { margin: -4px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
         .refund-submit-button { justify-self: start; min-height: 40px; padding: 0 16px; border: 1px solid rgba(255,140,155,.45); border-radius: 6px; color: #fff; background: linear-gradient(110deg, #842d40, #a1384c); box-shadow: 0 4px 14px rgba(151,34,52,.2); font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; transition: filter .2s, transform .2s, box-shadow .2s; }
         .refund-submit-button:hover { filter: brightness(1.12); box-shadow: 0 6px 18px rgba(151,34,52,.32); transform: translateY(-1px); }
@@ -197,7 +199,7 @@
                                     @if ($order->refundRequest->evidences->isNotEmpty())
                                         <div class="refund-evidence-list">
                                             @foreach ($order->refundRequest->evidences as $evidence)
-                                                <a href="{{ route('refund-evidence.download', $evidence) }}">Download evidence {{ $loop->iteration }}</a>
+                                                <a href="{{ route('refund-evidence.download', $evidence) }}">{{ $evidence->purpose === 'payment_qr' ? 'Download e-wallet QR code' : 'Download evidence '.$loop->iteration }}</a>
                                             @endforeach
                                         </div>
                                     @endif
@@ -213,6 +215,12 @@
                                         <label for="refund-attachments-{{ $order->id }}">Photos or video (optional)</label>
                                         <input id="refund-attachments-{{ $order->id }}" type="file" name="attachments[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple data-refund-attachments>
                                         <div class="refund-upload-previews" data-refund-preview aria-live="polite"></div>
+                                        <div class="refund-payment-qr">
+                                            <label for="refund-payment-qr-{{ $order->id }}">E-wallet QR code (optional)</label>
+                                            <input id="refund-payment-qr-{{ $order->id }}" type="file" name="payment_qr" accept="image/jpeg,image/png,image/webp" data-refund-payment-qr>
+                                            <div class="refund-upload-previews" data-refund-payment-qr-preview aria-live="polite"></div>
+                                            <p class="refund-request-help">Add a clear QR image if you would like to receive an approved refund through your e-wallet. This private image is visible only to you and authorized store staff; the store will arrange payment manually.</p>
+                                        </div>
                                         <p class="refund-request-help">Up to 3 files; JPG, PNG, WebP, MP4, MOV, or WebM, up to 12 MB each. Attachments are private and visible only to you and store staff. One request per order.</p>
                                         <button class="refund-submit-button" type="submit">Submit refund request</button>
                                     </form>
@@ -292,6 +300,33 @@
                     preview.append(caption);
                     previewContainer.append(preview);
                 });
+            });
+        });
+
+        document.querySelectorAll('[data-refund-payment-qr]').forEach(input => {
+            const previewContainer = input.closest('form').querySelector('[data-refund-payment-qr-preview]');
+            let previewUrl = null;
+
+            input.addEventListener('change', () => {
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                previewUrl = null;
+                previewContainer.replaceChildren();
+
+                const file = input.files?.[0];
+                if (!file || !file.type.startsWith('image/')) return;
+
+                previewUrl = URL.createObjectURL(file);
+                const preview = document.createElement('figure');
+                preview.className = 'refund-upload-preview';
+                const image = document.createElement('img');
+                image.src = previewUrl;
+                image.alt = 'Selected e-wallet QR code';
+                preview.append(image);
+
+                const caption = document.createElement('figcaption');
+                caption.textContent = 'E-wallet QR preview';
+                preview.append(caption);
+                previewContainer.append(preview);
             });
         });
 

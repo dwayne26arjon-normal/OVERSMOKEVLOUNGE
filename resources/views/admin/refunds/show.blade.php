@@ -45,12 +45,16 @@
             <h2>Damage description</h2>
             <p class="refund-description">{{ $refundRequest->description }}</p>
 
-            <h3>Evidence ({{ $refundRequest->evidences->count() }})</h3>
-            @if ($refundRequest->evidences->isEmpty())
+            @php
+                $damageEvidence = $refundRequest->evidences->where('purpose', '!=', 'payment_qr');
+                $paymentQr = $refundRequest->evidences->firstWhere('purpose', 'payment_qr');
+            @endphp
+            <h3>Damage evidence ({{ $damageEvidence->count() }})</h3>
+            @if ($damageEvidence->isEmpty())
                 <p class="refund-muted">No files were attached.</p>
             @else
                 <div class="refund-evidence-grid">
-                    @foreach ($refundRequest->evidences as $evidence)
+                    @foreach ($damageEvidence as $evidence)
                         <figure class="refund-evidence-card">
                             @if (str_starts_with($evidence->mime_type, 'image/'))
                                 <img src="{{ route('admin.refund-evidence.preview', $evidence) }}" alt="Refund evidence photo {{ $loop->iteration }}" loading="lazy">
@@ -65,6 +69,17 @@
                         </figure>
                     @endforeach
                 </div>
+            @endif
+
+            <h3>E-wallet payment QR</h3>
+            @if ($paymentQr)
+                <figure class="refund-evidence-card refund-payment-qr-card">
+                    <img src="{{ route('admin.refund-evidence.preview', $paymentQr) }}" alt="Customer e-wallet payment QR code" loading="lazy">
+                    <figcaption>{{ number_format($paymentQr->size / 1048576, 1) }} MB</figcaption>
+                    <a href="{{ route('admin.refund-evidence.download', $paymentQr) }}">Download QR code</a>
+                </figure>
+            @else
+                <p class="refund-muted">The customer did not provide an e-wallet QR code.</p>
             @endif
 
             @if ($refundRequest->admin_note)
@@ -127,6 +142,10 @@
         .refund-heading p { margin: 5px 0 0; color: #888291; font-size: 10px; }
         .refund-back-link { color: #a995dc; font-size: 10px; text-decoration: none; }
         .refund-back-link:hover { color: #fff; }
+        .refund-status { display: inline-flex; min-height: 28px; align-items: center; justify-content: center; padding: 0 12px; border: 1px solid #312943; border-radius: 999px; background: #1c1725; color: #c4b1ff; font-size: 11px; font-weight: 600; }
+        .refund-status.status-pending { border-color: rgba(212,160,45,.4); background: rgba(160,117,18,.14); color: #e8c35f; }
+        .refund-status.status-approved, .refund-status.status-refunded { border-color: rgba(48,180,122,.35); background: rgba(28,125,81,.14); color: #60d9a1; }
+        .refund-status.status-rejected { border-color: rgba(225,77,97,.4); background: rgba(151,34,52,.16); color: #ff7888; }
         .refund-error { margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(225,77,97,.3); border-radius: 6px; color: #ff9aa7; background: rgba(151,34,52,.12); font-size: 10px; }
         .refund-error p { margin: 0; }
         .refund-detail-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 12px; }
@@ -147,6 +166,7 @@
         .refund-evidence-card figcaption { color: #a9a2b1; font-size: 9px; }
         .refund-evidence-card a { color: #c4b1ff; font-size: 9px; text-decoration: none; }
         .refund-evidence-card a:hover { color: #fff; }
+        .refund-payment-qr-card { max-width: 280px; }
         .refund-review-card { margin-top: 12px; }
         .refund-review-form { display: grid; max-width: 560px; gap: 12px; }
         .refund-review-form label { display: block; margin-bottom: 5px; color: #c8c2d2; font-size: 10px; }

@@ -10,6 +10,7 @@ class RefundEvidence extends Model
     protected $table = 'refund_evidences';
 
     protected $fillable = [
+        'purpose',
         'disk',
         'path',
         'original_name',

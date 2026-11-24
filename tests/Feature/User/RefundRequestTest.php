@@ -36,6 +36,10 @@ class RefundRequestTest extends TestCase
                     ),
                     UploadedFile::fake()->create('unboxing.mp4', 100, 'video/mp4'),
                 ],
+                'payment_qr' => UploadedFile::fake()->createWithContent(
+                    'wallet-qr.png',
+                    base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lS8AAAAASUVORK5CYII=')
+                ),
             ])
             ->assertRedirect(route('orders'))
             ->assertSessionHas('status', 'Your refund request was submitted for review.');
@@ -45,6 +49,11 @@ class RefundRequestTest extends TestCase
         $this->assertSame($customer->id, $refundRequest->user_id);
         $this->assertSame('pending', $refundRequest->status);
         $this->assertSame('The bottle arrived cracked and leaked.', $refundRequest->description);
+        $this->assertSame(2, $refundRequest->evidences->where('purpose', 'evidence')->count());
+        $paymentQr = $refundRequest->evidences->firstWhere('purpose', 'payment_qr');
+        $this->assertNotNull($paymentQr);
+        $this->assertSame('image/png', $paymentQr->mime_type);
+        Storage::disk('local')->assertExists($paymentQr->path);
         $this->assertDatabaseHas('notifications', [
             'notifiable_id' => $admin->id,
             'type' => RefundRequestSubmitted::class,
@@ -60,7 +69,7 @@ class RefundRequestTest extends TestCase
             ->assertJsonPath('notifications.0.kind', 'refund_request')
             ->assertJsonPath('notifications.0.order_number', $order->order_number)
             ->assertJsonPath('notifications.0.url', route('admin.refunds.show', $refundRequest));
-        $this->assertCount(2, $refundRequest->evidences);
+        $this->assertCount(3, $refundRequest->evidences);
         Storage::disk('local')->assertExists($refundRequest->evidences->first()->path);
         Storage::disk('local')->assertExists($refundRequest->evidences->last()->path);
 
@@ -68,9 +77,16 @@ class RefundRequestTest extends TestCase
             ->get(route('refund-evidence.download', $refundRequest->evidences->first()))
             ->assertOk()
             ->assertHeader('X-Content-Type-Options', 'nosniff');
+        $this->actingAs($customer, 'web')
+            ->get(route('refund-evidence.download', $paymentQr))
+            ->assertOk()
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
 
         $this->actingAs($otherCustomer, 'web')
             ->get(route('refund-evidence.download', $refundRequest->evidences->first()))
+            ->assertNotFound();
+        $this->actingAs($otherCustomer, 'web')
+            ->get(route('refund-evidence.download', $paymentQr))
             ->assertNotFound();
 
         $this->actingAs($customer, 'web')
@@ -78,6 +94,7 @@ class RefundRequestTest extends TestCase
             ->assertOk()
             ->assertSee('Refund request:')
             ->assertSee('Pending')
+            ->assertSee('Download e-wallet QR code')
             ->assertDontSee('Request a refund');
 
         $this->actingAs($customer, 'web')
@@ -156,9 +173,10 @@ class RefundRequestTest extends TestCase
             ->post(route('orders.refunds.store', $order), [
                 'description' => 'The item arrived damaged.',
                 'attachments' => [UploadedFile::fake()->create('unsafe.svg', 1, 'image/svg+xml')],
+                'payment_qr' => UploadedFile::fake()->create('unsafe-qr.svg', 1, 'image/svg+xml'),
             ])
             ->assertRedirect(route('orders'))
-            ->assertSessionHasErrors('attachments.0');
+            ->assertSessionHasErrors(['attachments.0', 'payment_qr']);
 
         $this->assertDatabaseCount('refund_requests', 0);
     }

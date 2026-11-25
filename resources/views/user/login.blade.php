@@ -99,6 +99,14 @@
             color: var(--text);
         }
 
+        .input-wrap input:-webkit-autofill,
+        .input-wrap input:-webkit-autofill:hover,
+        .input-wrap input:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--text);
+            -webkit-box-shadow: 0 0 0 1000px var(--field) inset;
+            caret-color: var(--text);
+        }
+
         .input-wrap input:focus {
             outline: 2px solid var(--primary);
             outline-offset: 1px;

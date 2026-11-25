@@ -77,6 +77,17 @@
         .admin-account-menu form { margin: 0; }
         .admin-account-menu button { width: 100%; padding: 9px 10px; border: 0; border-radius: 5px; background: transparent; color: #c8c2d2; font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
         .admin-account-menu button:hover, .admin-account-menu button:focus-visible { outline: 0; background: rgba(116, 79, 205, .16); color: #fff; }
+        .admin-logout-dialog { width: min(420px, calc(100% - 32px)); padding: 24px; border: 1px solid rgba(124,92,240,.45); border-radius: 14px; color: #f4f1ff; background: #15121c; box-shadow: 0 24px 80px rgba(0,0,0,.58); }
+        .admin-logout-dialog::backdrop { background: rgba(5,4,8,.75); backdrop-filter: blur(4px); }
+        .admin-logout-dialog-icon { display: grid; width: 38px; height: 38px; margin-bottom: 12px; place-items: center; border: 1px solid rgba(124,92,240,.45); border-radius: 50%; color: #c4b5fd; background: rgba(124,92,240,.14); font-size: 19px; font-weight: 700; }
+        .admin-logout-eyebrow { margin: 0 0 5px; color: #b6a5ff; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .admin-logout-dialog h2 { margin: 0; color: #f4f1ff; font: 600 16px 'Outfit', sans-serif; }
+        .admin-logout-dialog > p:not(.admin-logout-eyebrow) { margin: 8px 0 0; color: #aaa4b2; font-size: 11px; line-height: 1.55; }
+        .admin-logout-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 21px; }
+        .admin-logout-actions button { min-height: 34px; padding: 0 12px; border: 1px solid #393347; border-radius: 6px; color: #d0cad8; background: #1b1823; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .admin-logout-actions button:focus-visible { outline: 2px solid #a98cff; outline-offset: 2px; }
+        .admin-logout-actions .admin-logout-proceed { border-color: #7655df; color: #fff; background: #6232e8; }
+        .admin-logout-actions .admin-logout-proceed:hover { background: #7655f2; }
         .page-content { max-width: 1500px; margin: 0 auto; padding: 25px 27px 38px; }
         .page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
         .page-heading h1 { margin: 0; font-family: 'Outfit', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: -.025em; }
@@ -247,7 +258,7 @@
                         <span class="avatar" aria-hidden="true">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr(auth('admin')->user()->name, 0, 1)) }}</span>
                     </button>
                     <div class="admin-account-menu" id="adminAccountMenu" hidden>
-                        <form method="POST" action="{{ route('admin.logout') }}">
+                        <form method="POST" action="{{ route('admin.logout') }}" data-admin-logout>
                             @csrf
                             <button type="submit">Sign out</button>
                         </form>
@@ -267,6 +278,16 @@
             </main>
         </div>
     </div>
+    <dialog class="admin-logout-dialog" id="adminLogoutConfirmDialog" aria-labelledby="adminLogoutConfirmTitle" aria-describedby="adminLogoutConfirmMessage">
+        <div class="admin-logout-dialog-icon" aria-hidden="true">?</div>
+        <p class="admin-logout-eyebrow">Please confirm</p>
+        <h2 id="adminLogoutConfirmTitle">Sign out of the admin portal?</h2>
+        <p id="adminLogoutConfirmMessage">You will need to sign in again to manage the store.</p>
+        <div class="admin-logout-actions">
+            <button class="admin-logout-cancel" id="cancelAdminLogout" type="button" autofocus>Stay signed in</button>
+            <button class="admin-logout-proceed" id="confirmAdminLogout" type="button">Sign out</button>
+        </div>
+    </dialog>
     <script>
         (() => {
             const flash = document.querySelector('[data-admin-flash]');
@@ -278,6 +299,32 @@
                 flash.querySelector('[data-dismiss-flash]').addEventListener('click', () => {
                     window.clearTimeout(flashTimeout);
                     dismissFlash();
+                });
+            }
+
+            const logoutForm = document.querySelector('[data-admin-logout]');
+            const logoutDialog = document.getElementById('adminLogoutConfirmDialog');
+            if (logoutForm && logoutDialog) {
+                let confirmedLogout = false;
+
+                logoutForm.addEventListener('submit', event => {
+                    if (confirmedLogout) {
+                        confirmedLogout = false;
+                        return;
+                    }
+
+                    event.preventDefault();
+                    logoutDialog.showModal();
+                });
+
+                document.getElementById('cancelAdminLogout').addEventListener('click', () => logoutDialog.close());
+                document.getElementById('confirmAdminLogout').addEventListener('click', () => {
+                    confirmedLogout = true;
+                    logoutDialog.close();
+                    logoutForm.requestSubmit();
+                });
+                logoutDialog.addEventListener('click', event => {
+                    if (event.target === logoutDialog) logoutDialog.close();
                 });
             }
 

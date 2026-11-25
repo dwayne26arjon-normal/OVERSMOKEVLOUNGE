@@ -82,7 +82,10 @@ class AdminAuthenticationTest extends TestCase
             ->assertSee('Total products')
             ->assertSee('adminAccountMenu', false)
             ->assertSee(route('admin.logout'), false)
-            ->assertSee('Sign out');
+            ->assertSee('Sign out')
+            ->assertSee('id="adminLogoutConfirmDialog"', false)
+            ->assertSee('Sign out of the admin portal?')
+            ->assertSee('Stay signed in');
     }
 
     public function test_staff_can_sign_in_through_the_admin_portal(): void

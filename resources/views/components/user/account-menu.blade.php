@@ -36,11 +36,21 @@
                 <strong data-notification-state>{{ auth('web')->user()->order_notifications_enabled ? 'On' : 'Off' }}</strong>
             </label>
             <p class="account-notification-status" data-notification-setting-status role="status" aria-live="polite" hidden></p>
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" data-user-logout>
                 @csrf
                 <button type="submit">Log out</button>
             </form>
         </div>
+        <dialog class="logout-confirm-dialog" id="userLogoutConfirmDialog" data-user-logout-dialog aria-labelledby="userLogoutConfirmTitle" aria-describedby="userLogoutConfirmMessage">
+            <div class="logout-confirm-icon" aria-hidden="true">?</div>
+            <p class="logout-confirm-eyebrow">Please confirm</p>
+            <h2 id="userLogoutConfirmTitle">Log out of your account?</h2>
+            <p id="userLogoutConfirmMessage">You will need to sign in again to access your account.</p>
+            <div class="logout-confirm-actions">
+                <button class="logout-confirm-cancel" data-user-logout-cancel type="button" autofocus>Stay signed in</button>
+                <button class="logout-confirm-proceed" data-user-logout-confirm type="button">Log out</button>
+            </div>
+        </dialog>
     @else
         <a class="guest-auth-link guest-login" href="{{ url('/go/login') }}">Log in</a>
         <a class="guest-auth-link guest-signup" href="{{ url('/go/register') }}">Sign up</a>

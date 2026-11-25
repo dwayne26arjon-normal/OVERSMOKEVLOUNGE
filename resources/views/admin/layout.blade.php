@@ -206,7 +206,6 @@
                 @if (auth('admin')->user()->is_admin)
                     <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}"><svg class="nav-icon nav-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c0-4 2.8-6.5 7-6.5s7 2.5 7 6.5"/></svg><span class="nav-text">Staff</span></a>
                 @endif
-                <span class="nav-link disabled" aria-disabled="true" title="Settings are not available in the admin area yet"><img class="nav-icon" src="{{ asset('images/admin-icons/settings.png') }}" alt=""><span class="nav-text">Settings</span></span>
             </nav>
             <div class="sidebar-bottom">
                 <a class="add-shortcut" href="{{ route('admin.products.create') }}">+ &nbsp; Add product</a>

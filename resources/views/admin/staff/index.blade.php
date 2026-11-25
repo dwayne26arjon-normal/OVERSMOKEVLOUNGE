@@ -202,10 +202,6 @@
             button.addEventListener('click', () => {
                 pendingStaffRemoveForm = document.getElementById(button.dataset.staffRemoveForm);
                 staffRemoveMessage.textContent = `Remove access for "${button.dataset.staffName}"? They will no longer be able to sign in.`;
-                if (typeof staffRemoveDialog.showModal !== 'function') {
-                    if (window.confirm(staffRemoveMessage.textContent)) pendingStaffRemoveForm.requestSubmit();
-                    return;
-                }
                 staffRemoveDialog.showModal();
                 confirmStaffRemove.focus();
             });

@@ -219,10 +219,6 @@
             button.addEventListener('click', () => {
                 pendingInventoryDeleteForm = document.getElementById(button.dataset.inventoryDeleteForm);
                 inventoryDeleteMessage.textContent = `Delete "${button.dataset.productName}"? This action cannot be undone.`;
-                if (typeof inventoryDeleteDialog.showModal !== 'function') {
-                    if (window.confirm(inventoryDeleteMessage.textContent)) pendingInventoryDeleteForm.requestSubmit();
-                    return;
-                }
                 inventoryDeleteDialog.showModal();
                 confirmInventoryDelete.focus();
             });

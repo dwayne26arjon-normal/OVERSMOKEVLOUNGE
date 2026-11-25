@@ -45,7 +45,8 @@ class AdminProductManagementTest extends TestCase
             ->assertSee('id="inventoryDeleteDialog"', false)
             ->assertSee('data-inventory-delete-form', false)
             ->assertSee('.delete-confirm-dialog::backdrop', false)
-            ->assertDontSee('onsubmit="return confirm(', false);
+            ->assertDontSee('onsubmit="return confirm(', false)
+            ->assertDontSee('window.confirm', false);
     }
 
     public function test_product_and_inventory_lists_use_scroll_pagination_with_page_totals(): void

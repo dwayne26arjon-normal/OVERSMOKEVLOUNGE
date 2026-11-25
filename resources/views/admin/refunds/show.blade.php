@@ -108,7 +108,7 @@
         <h2>Review decision</h2>
         @if ($refundRequest->status === 'pending')
             <p class="refund-muted">Choose an outcome. Approval records an amount but does not transfer money.</p>
-            <form method="POST" action="{{ route('admin.refunds.update', $refundRequest) }}" class="refund-review-form" id="refund-review-form">
+            <form method="POST" action="{{ route('admin.refunds.update', $refundRequest) }}" class="refund-review-form" id="refund-review-form" data-refund-confirmation="review">
                 @csrf
                 @method('PATCH')
                 <div>
@@ -132,7 +132,7 @@
             </form>
         @elseif ($refundRequest->status === 'approved')
             <p class="refund-muted">Confirm this refund has been sent to the customer outside this website before marking it complete.</p>
-            <form method="POST" action="{{ route('admin.refunds.update', $refundRequest) }}">
+            <form method="POST" action="{{ route('admin.refunds.update', $refundRequest) }}" data-refund-confirmation="complete">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="refunded">
@@ -148,6 +148,17 @@
             </p>
         @endif
     </section>
+
+    <dialog class="refund-confirm-dialog" id="refundConfirmDialog" aria-labelledby="refundConfirmTitle" aria-describedby="refundConfirmMessage">
+        <div class="refund-confirm-icon" aria-hidden="true">!</div>
+        <p class="refund-confirm-eyebrow">Please confirm</p>
+        <h2 id="refundConfirmTitle">Confirm refund decision?</h2>
+        <p id="refundConfirmMessage">This will update the refund request and notify the customer.</p>
+        <div class="refund-confirm-actions">
+            <button class="refund-confirm-cancel" id="cancelRefundConfirmation" type="button">Go back</button>
+            <button class="refund-confirm-proceed" id="confirmRefundAction" type="button">Confirm decision</button>
+        </div>
+    </dialog>
 @endsection
 
 @push('styles')
@@ -195,6 +206,19 @@
         .refund-field-error { margin: 5px 0 0; color: #ff8e9b; font-size: 9px; }
         .refund-primary-button { min-height: 35px; justify-self: start; padding: 0 13px; border: 1px solid #5235a0; border-radius: 6px; background: linear-gradient(100deg, #5127d2, #7140e8); color: #fff; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
         .refund-primary-button:hover { filter: brightness(1.15); }
+        .refund-confirm-dialog { width: min(420px, calc(100% - 32px)); padding: 24px; border: 1px solid #393044; border-radius: 12px; background: #17141f; color: #f4f1ff; box-shadow: 0 22px 70px rgba(0,0,0,.55); }
+        .refund-confirm-dialog::backdrop { background: rgba(5,4,8,.72); backdrop-filter: blur(3px); }
+        .refund-confirm-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgba(212,160,45,.4); border-radius: 50%; background: rgba(160,117,18,.14); color: #e8c35f; font-size: 20px; font-weight: 700; }
+        .refund-confirm-eyebrow { margin: 14px 0 5px; color: #b6a5ff; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .refund-confirm-dialog h2 { margin: 0; font: 600 16px 'Outfit', sans-serif; }
+        .refund-confirm-dialog > p:not(.refund-confirm-eyebrow) { margin: 8px 0 0; color: #aaa4b2; font-size: 11px; line-height: 1.55; }
+        .refund-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 21px; }
+        .refund-confirm-actions button { min-height: 34px; padding: 0 12px; border: 1px solid #393347; border-radius: 6px; color: #d0cad8; background: #1b1823; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .refund-confirm-actions button:focus-visible { outline: 2px solid #a98cff; outline-offset: 2px; }
+        .refund-confirm-actions .refund-confirm-proceed { border-color: #7655df; color: #fff; background: #6232e8; }
+        .refund-confirm-actions .refund-confirm-proceed:hover { background: #7655f2; }
+        .refund-confirm-actions .refund-confirm-proceed.is-danger { border-color: #9a3445; background: #8d293a; }
+        .refund-confirm-actions .refund-confirm-proceed.is-danger:hover { background: #a83246; }
         @media (max-width: 760px) { .refund-detail-grid { grid-template-columns: 1fr; } }
         @media (max-width: 480px) { .refund-heading { align-items: flex-start; flex-direction: column; gap: 10px; } }
     </style>
@@ -203,8 +227,8 @@
 @push('scripts')
     <script>
         const refundStatus = document.getElementById('refund-status');
+        const amountField = document.getElementById('approved-amount');
         if (refundStatus) {
-            const amountField = document.getElementById('approved-amount');
             const noteField = document.getElementById('admin-note');
             const updateRefundFields = () => {
                 amountField.required = refundStatus.value === 'approved';
@@ -213,14 +237,61 @@
 
             refundStatus.addEventListener('change', updateRefundFields);
             updateRefundFields();
-
-            const reviewForm = document.getElementById('refund-review-form');
-            reviewForm.addEventListener('submit', event => {
-                if (refundStatus.value !== 'approved') return;
-
-                const confirmation = `Approve this refund request for ₱${amountField.value}? This records your decision for the customer to see in their order history. No payment will be sent by this website.`;
-                if (!window.confirm(confirmation)) event.preventDefault();
-            });
         }
+
+        const refundConfirmDialog = document.getElementById('refundConfirmDialog');
+        const refundConfirmTitle = document.getElementById('refundConfirmTitle');
+        const refundConfirmMessage = document.getElementById('refundConfirmMessage');
+        const confirmRefundAction = document.getElementById('confirmRefundAction');
+        let pendingRefundForm = null;
+        let confirmedRefundForm = null;
+
+        document.querySelectorAll('[data-refund-confirmation]').forEach(form => {
+            form.addEventListener('submit', event => {
+                if (confirmedRefundForm === form) {
+                    confirmedRefundForm = null;
+                    return;
+                }
+
+                event.preventDefault();
+                pendingRefundForm = form;
+                confirmRefundAction.classList.remove('is-danger');
+
+                if (form.dataset.refundConfirmation === 'complete') {
+                    refundConfirmTitle.textContent = 'Mark refund as complete?';
+                    refundConfirmMessage.textContent = 'Confirm you have sent the approved refund to the customer outside this website. This only records the completion; it does not transfer money.';
+                    confirmRefundAction.textContent = 'Mark as refunded';
+                } else if (refundStatus.value === 'approved') {
+                    refundConfirmTitle.textContent = 'Approve this refund request?';
+                    refundConfirmMessage.textContent = `Approve this refund request for ₱${amountField.value}? This records your decision for the customer to see in their order history. No payment will be sent by this website.`;
+                    confirmRefundAction.textContent = 'Approve request';
+                } else {
+                    refundConfirmTitle.textContent = 'Decline this refund request?';
+                    refundConfirmMessage.textContent = 'This will record your decision and notify the customer with your response.';
+                    confirmRefundAction.textContent = 'Decline request';
+                    confirmRefundAction.classList.add('is-danger');
+                }
+
+                refundConfirmDialog.showModal();
+            });
+        });
+
+        document.getElementById('cancelRefundConfirmation').addEventListener('click', () => refundConfirmDialog.close());
+        confirmRefundAction.addEventListener('click', () => {
+            if (!pendingRefundForm) return;
+
+            const form = pendingRefundForm;
+            pendingRefundForm = null;
+            confirmedRefundForm = form;
+            refundConfirmDialog.close();
+            form.requestSubmit();
+            if (confirmedRefundForm === form) confirmedRefundForm = null;
+        });
+        refundConfirmDialog.addEventListener('close', () => {
+            pendingRefundForm = null;
+        });
+        refundConfirmDialog.addEventListener('click', event => {
+            if (event.target === refundConfirmDialog) refundConfirmDialog.close();
+        });
     </script>
 @endpush

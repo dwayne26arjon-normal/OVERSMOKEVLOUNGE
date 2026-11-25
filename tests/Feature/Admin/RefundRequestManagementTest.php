@@ -108,7 +108,10 @@ class RefundRequestManagementTest extends TestCase
             ->assertSee('data-refund-review-checklist', false)
             ->assertSee('The package arrived damaged.')
             ->assertSee('Approve request')
+            ->assertSee('id="refundConfirmDialog"', false)
             ->assertSee('Approve this refund request for', false)
+            ->assertSee('Decline this refund request?', false)
+            ->assertDontSee('window.confirm', false)
             ->assertSee('Approval records an amount but does not transfer money.');
 
         $this->actingAs($admin, 'admin')
@@ -139,6 +142,13 @@ class RefundRequestManagementTest extends TestCase
             ->assertJsonPath('notifications.0.kind', 'refund_review')
             ->assertJsonPath('notifications.0.order_number', $refundRequest->order->order_number)
             ->assertJsonPath('notifications.0.message', 'Your refund request was approved.');
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.refunds.show', $refundRequest))
+            ->assertOk()
+            ->assertSee('data-refund-confirmation="complete"', false)
+            ->assertSee('Mark refund as complete?', false)
+            ->assertDontSee('window.confirm', false);
 
         $this->actingAs($admin, 'admin')
             ->patch(route('admin.refunds.update', $refundRequest), [

@@ -233,6 +233,7 @@ class OrdersTest extends TestCase
             ->assertSee('Keep order')
             ->assertSee('Yes, cancel order')
             ->assertDontSee('onsubmit="return confirm(', false)
+            ->assertDontSee('window.confirm', false)
             ->assertSee('Saved to your account');
     }
 

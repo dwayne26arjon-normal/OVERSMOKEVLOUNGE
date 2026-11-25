@@ -271,11 +271,6 @@
         document.querySelectorAll('[data-order-cancel]').forEach(form => {
             form.addEventListener('submit', event => {
                 event.preventDefault();
-                if (typeof orderCancelDialog.showModal !== 'function') {
-                    if (window.confirm('Cancel this order?')) form.submit();
-                    return;
-                }
-
                 pendingOrderCancelForm = form;
                 orderCancelDialog.showModal();
             });

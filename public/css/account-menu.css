@@ -902,7 +902,9 @@
 
     .user-notification-toast {
         top: 112px;
-        right: 12px;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .user-notification-menu {
